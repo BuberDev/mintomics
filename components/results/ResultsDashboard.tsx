@@ -7,6 +7,7 @@ import RedFlagsList from "@/components/charts/RedFlagsList";
 import SellPressureTable from "@/components/charts/SellPressureTable";
 import VestingTimelineChart from "@/components/charts/VestingTimelineChart";
 import UpgradeModal from "@/components/results/UpgradeModal";
+import { trackEvent } from "@/lib/analytics/client";
 import { exportReportToPdf } from "@/lib/export/reportPdf";
 import type { PlanTier, SellPressureRow, TokenomicsOutput } from "@/types/mintomics";
 
@@ -191,9 +192,22 @@ export default function ResultsDashboard({
 
   const hiddenRedFlagsCount = result.redFlags.length - visibleRedFlags.length;
 
+  const openUpgrade = (reason: "export" | "red_flags") => {
+    setUpgradeReason(reason);
+    void trackEvent("paywall_viewed", {
+      reason,
+      projectName: result.projectName,
+    });
+    void trackEvent("upgrade_started", {
+      reason,
+      plan,
+      projectName: result.projectName,
+    });
+  };
+
   const handleExport = async () => {
     if (plan !== "pro") {
-      setUpgradeReason("export");
+      openUpgrade("export");
       return;
     }
 
@@ -211,8 +225,12 @@ export default function ResultsDashboard({
         element: reportElement,
         filename: `${slugify(result.projectName)}-${result.tokenSymbol.toLowerCase()}-mintomics-report.pdf`,
       });
+      void trackEvent("pdf_exported", {
+        projectName: result.projectName,
+        tokenSymbol: result.tokenSymbol,
+      });
     } catch (error) {
-      console.error("[TokenForge] PDF export failed:", error);
+      console.error("[Mintomics] PDF export failed:", error);
       setExportError("PDF export failed. Please try again.");
     } finally {
       setIsExporting(false);
@@ -249,7 +267,7 @@ export default function ResultsDashboard({
               : "border border-white/15 bg-white/5 text-gray-300"
               }`}
           >
-            {plan === "pro" ? "Pro Preview" : "Free Plan"}
+            {plan === "pro" ? "Pro" : "Free Plan"}
           </div>
           <button
             onClick={handleExport}
@@ -260,7 +278,7 @@ export default function ResultsDashboard({
           </button>
           {plan === "free" && (
             <button
-              onClick={() => setUpgradeReason("red_flags")}
+              onClick={() => openUpgrade("red_flags")}
               className="rounded-lg border border-white/30 px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-white/50 hover:text-white"
             >
               Unlock Pro
@@ -297,10 +315,10 @@ export default function ResultsDashboard({
               </p>
             </div>
             <button
-              onClick={() => setUpgradeReason("export")}
+              onClick={() => openUpgrade("export")}
               className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100"
             >
-              Unlock Pro Preview
+              Unlock Pro
             </button>
           </div>
         </section>
@@ -439,7 +457,7 @@ export default function ResultsDashboard({
               Upgrade to unlock the full issue list, deeper recommendations, and exportable investor-ready reporting.
             </p>
             <button
-              onClick={() => setUpgradeReason("red_flags")}
+              onClick={() => openUpgrade("red_flags")}
               className="mt-4 rounded-lg border border-white/30 px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-white/50 hover:text-white"
             >
               Reveal Full Report
@@ -456,7 +474,9 @@ export default function ResultsDashboard({
         hiddenRedFlagsCount={hiddenRedFlagsCount}
         isOpen={upgradeReason !== null}
         reason={upgradeReason ?? "export"}
-        onClose={() => setUpgradeReason(null)}
+        onClose={() => {
+          setUpgradeReason(null);
+        }}
         onUnlockPreview={() => {
           setUpgradeReason(null);
           onUpgradePreview();

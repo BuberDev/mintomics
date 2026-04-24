@@ -28,7 +28,7 @@ export async function DELETE(
 
     return new Response(null, { status: 204 });
   } catch (error) {
-    console.error("[TokenForge] Failed to delete project:", error);
+    console.error("[Mintomics] Failed to delete project:", error);
     return new Response(JSON.stringify({ error: "Failed to delete project." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
@@ -72,7 +72,7 @@ export async function PATCH(
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("[TokenForge] Failed to update plan:", error);
+    console.error("[Mintomics] Failed to update plan:", error);
     return new Response(JSON.stringify({ error: "Failed to update plan." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

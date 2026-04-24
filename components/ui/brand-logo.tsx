@@ -43,7 +43,7 @@ function MintomicsMark({ className = "" }: { className?: string }) {
 }
 
 const sharedWrapper =
-  "inline-flex items-center justify-center overflow-hidden border border-white/15 bg-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl ring-1 ring-white/10";
+  "inline-flex items-center justify-center overflow-hidden border border-white/10 bg-white/[0.05] shadow-[0_12px_30px_rgba(0,0,0,0.26)] backdrop-blur-xl";
 
 export default function BrandLogo({
   variant,
@@ -56,7 +56,7 @@ export default function BrandLogo({
   if (variant === "icon") {
     return (
       <span
-        className={`${sharedWrapper} rounded-[1.35rem] px-2 py-2 ${className}`}
+        className={`${sharedWrapper} rounded-2xl px-2 py-2 ${className}`}
         style={style}
         role="img"
         aria-label={alt}

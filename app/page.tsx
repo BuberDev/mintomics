@@ -1,15 +1,17 @@
-import Link from "next/link";
 import {
-  ArrowRight,
   BadgeAlert,
   Blocks,
   CandlestickChart,
   Layers3,
-  ShieldCheck,
 } from "lucide-react";
 import Footer4Col from "@/components/ui/footer-column";
 import FooterNewsletter from "@/components/ui/demo";
 import EtherealBeamsHero from "@/components/ui/ethereal-beams-hero";
+import SiteHeader from "@/components/ui/site-header";
+import TrackPageView from "@/components/analytics/TrackPageView";
+import PricingTiers from "@/components/pricing/PricingTiers";
+import { auth } from "@clerk/nextjs/server";
+import { isClerkConfigured } from "@/lib/auth/config";
 
 const featureCards = [
   {
@@ -47,39 +49,34 @@ const processSteps = [
   },
 ];
 
-const pricingTiers = [
+const testimonials = [
   {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    description: "For founders validating the rough shape of a token model.",
-    features: ["1 design per month", "Charts included", "3 red flags preview", "No PDF export"],
-    cta: "Start Free",
-    highlight: false,
+    quote:
+      "It cut our token design review from a week of whiteboarding to one usable model in a single session.",
+    name: "Nina K.",
+    role: "DeFi founder",
   },
   {
-    name: "Pro",
-    price: "$49",
-    period: "/month",
-    description: "For teams preparing decks, diligence calls, and internal token decisions.",
-    features: ["Unlimited designs", "Full red flag report", "PDF export", "Unlimited iterations", "Project history"],
-    cta: "Start Pro Trial",
-    highlight: true,
+    quote:
+      "The red flag breakdown is the first AI output I felt comfortable putting in front of an advisor call.",
+    name: "Marcus L.",
+    role: "Crypto operator",
   },
   {
-    name: "Agency",
-    price: "$149",
-    period: "/month",
-    description: "For advisors and crypto operators handling multiple client models.",
-    features: ["Everything in Pro", "Client workflows", "White-label reports soon", "API access soon", "Priority support"],
-    cta: "Talk to Us",
-    highlight: false,
+    quote:
+      "I stopped rebuilding spreadsheets for every client. The structure is clean enough to ship.",
+    name: "Sofia R.",
+    role: "Web3 advisor",
   },
-];
+] as const;
 
 export default function LandingPage() {
+  const isSignedIn = isClerkConfigured() ? Boolean(auth().userId) : false;
+
   return (
     <main className="min-h-screen overflow-hidden bg-black text-gray-100">
+      <SiteHeader />
+      <TrackPageView eventName="landing_viewed" payload={{ surface: "home" }} />
       <EtherealBeamsHero />
 
       <section id="features" className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8">
@@ -184,66 +181,49 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section id="testimonials" className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
+            Early Feedback
+          </p>
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">
+            Builders want clarity, not another token spreadsheet.
+          </h2>
+        </div>
+
+        <div className="mt-14 grid gap-6 lg:grid-cols-3">
+          {testimonials.map(({ quote, name, role }) => (
+            <figure
+              key={name}
+              className="glass-effect rounded-[2rem] p-7 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20"
+            >
+              <blockquote className="text-base leading-8 text-gray-300">
+                “{quote}”
+              </blockquote>
+              <figcaption className="mt-6">
+                <p className="font-semibold text-white">{name}</p>
+                <p className="text-sm text-gray-500">{role}</p>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
       <section id="pricing" className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
             Pricing
           </p>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">
-            Priced like software, not a consulting bottleneck.
+            Transparent pricing for teams that need speed, signal, and exportable output.
           </h2>
           <p className="mt-5 text-base leading-8 text-gray-400">
-            Start free, validate the model shape, then unlock the reporting and iteration power when the token story needs to leave your screen.
+            Start free to validate the shape. Move to Pro for investor-ready reports, or Agency when you need repeatable delivery for clients.
           </p>
         </div>
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {pricingTiers.map(({ name, price, period, description, features, cta, highlight }) => (
-            <div
-              key={name}
-              className={`rounded-[2rem] p-7 ${highlight
-                  ? "glass-effect border border-white/25 shadow-2xl shadow-white/10"
-                  : "glass-effect"
-                }`}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xl font-semibold text-white">{name}</p>
-                  <p className="mt-3 text-sm leading-7 text-gray-400">{description}</p>
-                </div>
-                {highlight && (
-                  <div className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
-                    Best Value
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-8 flex items-end gap-2">
-                <span className="text-5xl font-semibold tracking-tight text-white">{price}</span>
-                <span className="pb-2 text-sm text-gray-500">{period}</span>
-              </div>
-
-              <ul className="mt-8 space-y-4">
-                {features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3 text-sm text-gray-300">
-                    <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0 text-white/80" />
-                    <span className="leading-6">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/generate"
-                className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-semibold transition ${highlight
-                    ? "bg-white text-black hover:bg-gray-100"
-                    : "border border-white/15 bg-white/5 text-white hover:border-white/30 hover:bg-white/10"
-                  }`}
-              >
-                {cta}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          ))}
+        <div className="mt-14">
+          <PricingTiers isSignedIn={isSignedIn} />
         </div>
       </section>
 

@@ -40,3 +40,27 @@
     @apply bg-gradient-to-r from-brand-400 to-purple-400 bg-clip-text text-transparent;
   }
 }
+
+/* Nuclear Clerk Hider - removes watermarks and dev mode badges from ALL components */
+[class*="cl-internal-b3al4t"], 
+[class*="cl-internal-1hp5nqm"],
+[class*="cl-internal-18y1hwz"],
+[class*="cl-internal-11uajcs"],
+[class*="cl-internal-16re01m"],
+.cl-watermark,
+.cl-footer,
+.cl-userButtonPopoverFooter,
+.cl-navbarMobileMenuRow,
+a[href*="clerk.com"],
+a[href*="clerk.dev"],
+div:has(> a[href*="clerk."]),
+/* Target the specific orange color used for Development Mode text */
+[style*="color: rgb(255, 110, 0)"],
+[style*="color: #ff6e00"],
+[style*="color: rgb(255, 126, 0)"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+

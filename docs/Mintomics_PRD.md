@@ -14,7 +14,7 @@
 
 ## 1. Executive Summary
 
-Mintomics is a web-based SaaS tool that allows Web3 founders to design, simulate, and validate their token economics in minutes — without needing to hire a token engineer. By combining AI with domain expertise in token engineering, TokenForge generates complete mintomics models including allocation tables, vesting schedules, emission curves, sell pressure analysis, and investor red flag reports.
+Mintomics is a web-based SaaS tool that allows Web3 founders to design, simulate, and validate their token economics in minutes — without needing to hire a token engineer. By combining AI with domain expertise in token engineering, Mintomics generates complete mintomics models including allocation tables, vesting schedules, emission curves, sell pressure analysis, and investor red flag reports.
 
 ### The Core Problem
 
@@ -108,7 +108,7 @@ The entire experience from landing on the site to downloading a report must take
 | **5. Results Dashboard** | Sees: allocation pie chart, vesting timeline, emission curve, sell pressure table, red flags list. |
 | **6. Iterate** | Adjusts sliders (team %, cliff length, etc.) and regenerates in real time. |
 | **7. Export** | Downloads PDF report (Pro) or copies summary (Free). Shares link with co-founders or investors. |
-| **8. Upgrade** | Hits free tier limit or wants PDF export. Upgrades to Pro ($49/month) via Lemon Squeezy. |
+| **8. Upgrade** | Hits free tier limit or wants PDF export. Upgrades to Pro ($49/month) via Stripe Checkout. |
 
 ---
 
@@ -131,7 +131,7 @@ The entire experience from landing on the site to downloading a report must take
 - Investor red flags checklist (AI-generated)
 - PDF export of full report (Pro tier only)
 - User auth (Clerk — Google + email)
-- Subscription billing (Lemon Squeezy — handles EU VAT)
+- Subscription billing (Stripe Checkout + webhooks)
 - Landing page with demo
 
 ### 5.2 OUT of Scope (Post-MVP)
@@ -158,7 +158,7 @@ Chosen for: minimal infrastructure overhead, fast development, zero DevOps compl
 | **AI Engine** | Claude 3.5 Sonnet via Vercel AI SDK — best reasoning for structured financial output |
 | **Charts** | Recharts — lightweight, React-native, no extra bundle cost |
 | **Auth** | Clerk — handles Google OAuth + email, free up to 10K MAU |
-| **Payments** | Lemon Squeezy — handles EU VAT automatically, webhook support |
+| **Payments** | Stripe — hosted Checkout, webhook support, optional Stripe Tax if needed |
 | **PDF Generation** | jsPDF + html2canvas for MVP — fast client-side export from the report view |
 | **Hosting** | Vercel — free tier, automatic deploys from GitHub |
 | **Database** | Vercel Postgres (or PlanetScale free) — store projects + user data |
@@ -262,7 +262,7 @@ Based on 4–8 hours per week. Timeline is aggressive but achievable for a senio
 | **Week 3–4** | Onboarding form (3-step wizard) + basic results page. Working end-to-end flow without auth. |
 | **Week 5–6** | Charts (Recharts): allocation pie, vesting timeline, emission curve. Sell pressure table. |
 | **Week 7** | Auth (Clerk) + database (Vercel Postgres) + project save/load functionality. |
-| **Week 8** | Payments (Lemon Squeezy) + tier gating. PDF export (Pro tier). Free vs Pro feature locks. |
+| **Week 8** | Payments (Stripe) + tier gating. PDF export (Pro tier). Free vs Pro feature locks. |
 | **Week 9** | Landing page + pricing page + SEO meta. UI polish. Mobile responsiveness. |
 | **Week 10** | Beta testing with 5–10 real Web3 founders. Fix critical bugs. Collect feedback. |
 | **Week 11–12** | ProductHunt preparation + launch. Reddit posts. Twitter launch thread. |
@@ -391,7 +391,7 @@ Every successful generation must return a structured result that can be rendered
 
 - Free tier clearly shows what is limited vs. unlocked in Pro.
 - Upgrade prompt is shown at the moment of highest intent: full red flags, PDF export, or usage limit reached.
-- Billing handoff to Lemon Squeezy feels seamless and trustworthy.
+- Billing handoff to Stripe Checkout feels seamless and trustworthy.
 
 ---
 
@@ -410,8 +410,8 @@ Every successful generation must return a structured result that can be rendered
 
 - API keys must never be exposed client-side.
 - User projects must be isolated by account once auth and persistence are enabled.
-- TokenForge must clearly state that outputs are decision-support materials, not financial advice.
-- Sensitive billing and authentication flows should be delegated to trusted third-party infrastructure (Clerk, Lemon Squeezy).
+- Mintomics must clearly state that outputs are decision-support materials, not financial advice.
+- Sensitive billing and authentication flows should be delegated to trusted third-party infrastructure (Clerk, Stripe).
 
 ### 15.3 UX Quality Bar
 

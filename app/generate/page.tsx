@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import AuthControls from "@/components/auth/AuthControls";
 import TokenomicsForm from "@/components/forms/TokenomicsForm";
 import ProjectHistorySidebar from "@/components/results/ProjectHistorySidebar";
+import { trackEvent } from "@/lib/analytics/client";
 import { createDefaultTokenomicsInput } from "@/lib/mintomics/defaultInput";
 import {
   deleteProjectRecord,
@@ -19,53 +20,98 @@ import type {
   GenerationStatus,
 } from "@/types/mintomics";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import ResultsDashboard from "@/components/results/ResultsDashboard";
 import BrandLogo from "@/components/ui/brand-logo";
 
-function parsePossiblyWrappedJson<T>(text: string): T {
-  const trimmed = text.trim();
-  const withoutFence = trimmed
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/, "")
-    .trim();
-
-  try {
-    return JSON.parse(withoutFence) as T;
-  } catch { }
-
-  const firstBrace = withoutFence.indexOf("{");
-  const lastBrace = withoutFence.lastIndexOf("}");
-  if (firstBrace !== -1 && lastBrace > firstBrace) {
-    return JSON.parse(withoutFence.slice(firstBrace, lastBrace + 1)) as T;
-  }
-
-  return JSON.parse(withoutFence) as T;
-}
-
 export default function GeneratePage() {
+  const searchParams = useSearchParams();
+  const checkoutState = searchParams.get("checkout");
+  const checkoutSessionId = searchParams.get("session_id");
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [result, setResult] = useState<TokenomicsOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [streamedText, setStreamedText] = useState("");
-  const [plan, setPlan] = useState<PlanTier>("free");
+  const [billingPlan, setBillingPlan] = useState<PlanTier>(checkoutState === "success" ? "pro" : "free");
+  const [plan, setPlan] = useState<PlanTier>(checkoutState === "success" ? "pro" : "free");
+  const [billingSyncState, setBillingSyncState] = useState<"idle" | "verifying" | "synced">(
+    checkoutState === "success" ? "verifying" : "idle",
+  );
   const [savedProjects, setSavedProjects] = useState<SavedTokenomicsProject[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [draftInput, setDraftInput] = useState<TokenomicsInput>(
     createDefaultTokenomicsInput(),
   );
+  const [lastSubmittedInput, setLastSubmittedInput] = useState<TokenomicsInput | null>(null);
   const [formResetKey, setFormResetKey] = useState(0);
   const isGenerating = status === "generating" || status === "streaming";
+  const effectivePlan: PlanTier = billingPlan === "pro" ? "pro" : plan;
 
   useEffect(() => {
     void syncSavedProjects();
   }, []);
+
+  useEffect(() => {
+    void fetch("/api/billing/status")
+      .then(async (response) => {
+        if (!response.ok) {
+          return null;
+        }
+
+        return response.json() as Promise<{ billing?: { plan?: PlanTier } }>;
+      })
+      .then((payload) => {
+        const serverPlan = payload?.billing?.plan;
+        if (serverPlan === "pro") {
+          setBillingPlan("pro");
+          setPlan("pro");
+        }
+      })
+      .catch((err) => {
+        console.error("[Mintomics] Failed to load billing status:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (checkoutState !== "success") {
+      setBillingSyncState("synced");
+      return;
+    }
+
+    if (!checkoutSessionId) {
+      setBillingSyncState("synced");
+      return;
+    }
+
+    setBillingSyncState("verifying");
+
+    void fetch(`/api/billing/complete?session_id=${encodeURIComponent(checkoutSessionId)}`)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Unable to confirm checkout.");
+        }
+
+        return response.json() as Promise<{ plan?: PlanTier; billingPlan?: "pro"; cycle?: "monthly" | "annual" }>;
+      })
+      .then((payload) => {
+        if (payload.plan === "pro" || payload.billingPlan === "pro") {
+          setBillingPlan("pro");
+          setPlan("pro");
+        }
+      })
+      .catch((err) => {
+        console.error("[Mintomics] Failed to confirm checkout:", err);
+      })
+      .finally(() => {
+        setBillingSyncState("synced");
+      });
+  }, [checkoutSessionId, checkoutState, searchParams]);
 
   const syncSavedProjects = async () => {
     try {
       const projects = await listSavedProjects();
       setSavedProjects(projects);
     } catch (err) {
-      console.error("[TokenForge] Failed to sync projects:", err);
+      console.error("[Mintomics] Failed to sync projects:", err);
       const message =
         err instanceof Error ? err.message : "Failed to load saved projects.";
       setError((current) => current ?? message);
@@ -76,8 +122,7 @@ export default function GeneratePage() {
     setStatus("idle");
     setResult(null);
     setError(null);
-    setStreamedText("");
-    setPlan("free");
+    setPlan(billingPlan);
     setActiveProjectId(null);
     setDraftInput(createDefaultTokenomicsInput());
     setFormResetKey((value) => value + 1);
@@ -90,8 +135,11 @@ export default function GeneratePage() {
     setResult(project.result);
     setStatus("complete");
     setError(null);
-    setStreamedText("");
     setFormResetKey((value) => value + 1);
+    void trackEvent("project_opened", {
+      projectId: project.id,
+      plan: project.plan,
+    });
   };
 
   const handleDeleteProject = async (projectId: string) => {
@@ -107,6 +155,7 @@ export default function GeneratePage() {
     try {
       await deleteProjectRecord(projectId);
       await syncSavedProjects();
+      void trackEvent("project_deleted", { projectId });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to delete project.";
@@ -122,9 +171,13 @@ export default function GeneratePage() {
   const handleGenerate = async (input: TokenomicsInput) => {
     setStatus("generating");
     setError(null);
-    setStreamedText("");
     setResult(null);
     setDraftInput(input);
+    setLastSubmittedInput(input);
+    void trackEvent("generation_started", {
+      projectName: input.projectName,
+      projectType: input.projectType,
+    });
 
     try {
       const response = await fetch("/api/generate", {
@@ -147,38 +200,12 @@ export default function GeneratePage() {
 
         throw new Error(errorMessage);
       }
-      if (!response.body) throw new Error("No response body");
-
       setStatus("streaming");
 
-      // Read the stream
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let fullText = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        // Vercel AI SDK data stream format — extract text chunks
-        const lines = chunk.split("\n").filter(Boolean);
-        for (const line of lines) {
-          if (line.startsWith("0:")) {
-            try {
-              const text = JSON.parse(line.slice(2));
-              fullText += text;
-              setStreamedText(fullText);
-            } catch { }
-          }
-        }
-      }
-
-      // Parse the complete JSON output
-      const parsed: TokenomicsOutput = parsePossiblyWrappedJson<TokenomicsOutput>(fullText);
+      const parsed: TokenomicsOutput = await response.json();
       const savedProject = await saveProjectRecord({
         input,
-        plan,
+        plan: effectivePlan,
         projectId: activeProjectId,
         result: parsed,
       });
@@ -187,25 +214,33 @@ export default function GeneratePage() {
       await syncSavedProjects();
       setResult(parsed);
       setStatus("complete");
+      void trackEvent("generation_completed", {
+        projectId: savedProject.id,
+        readinessScore: parsed.investorReadinessScore,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setStatus("error");
+      void trackEvent("generation_failed", {
+        projectName: input.projectName,
+      });
     }
+  };
+
+  const retryLastGeneration = () => {
+    void handleGenerate(lastSubmittedInput ?? draftInput);
   };
 
   return (
     <div className="min-h-screen bg-black">
+      <Suspense fallback={null}>
+        <SignupCompletionTracker plan={effectivePlan} />
+      </Suspense>
+
       {/* Header */}
       <header className="border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <BrandLogo
-              variant="icon"
-              width={36}
-              height={36}
-              priority
-              className="h-9 w-9"
-            />
+          <Link href="/" className="inline-flex items-center gap-2.5 transition-transform hover:scale-105">
             <BrandLogo
               variant="wordmark"
               width={220}
@@ -216,12 +251,16 @@ export default function GeneratePage() {
           </Link>
           <div className="flex items-center gap-3 text-gray-400 text-sm">
             <span
-              className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${plan === "pro"
+              className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${effectivePlan === "pro"
                 ? "border border-white/25 bg-white/10 text-white"
                 : "border border-white/15 bg-white/5 text-gray-300"
                 }`}
             >
-              {plan === "pro" ? "Pro Preview" : "Free Plan"}
+              {billingSyncState === "verifying"
+                ? "Confirming purchase..."
+                : effectivePlan === "pro"
+                  ? "Pro"
+                  : "Free Plan"}
             </span>
             {status === "streaming" && (
               <span className="flex items-center gap-2">
@@ -231,6 +270,9 @@ export default function GeneratePage() {
             )}
             {status === "complete" && (
               <span className="text-green-400">✓ Generation complete</span>
+            )}
+            {billingSyncState === "verifying" && (
+              <span className="text-gray-300">Verifying Stripe payment...</span>
             )}
             <AuthControls mode="app" />
           </div>
@@ -256,13 +298,21 @@ export default function GeneratePage() {
                     Design your mintomics
                   </h1>
                   <p className="text-gray-400">
-                    Fill in your project details and get a complete model in ~30 seconds.
+                    Fill in your project details and get a complete model in about 60 seconds.
                   </p>
                 </div>
 
                 {error && (
                   <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6 text-red-400 text-sm">
-                    {error}
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <p>{error}</p>
+                      <button
+                        onClick={retryLastGeneration}
+                        className="rounded-lg border border-red-400/30 px-4 py-2 text-sm font-medium text-red-200 transition-colors hover:border-red-300 hover:text-white"
+                      >
+                        Retry last generation
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -271,6 +321,11 @@ export default function GeneratePage() {
                   isLoading={isGenerating}
                   onSubmit={handleGenerate}
                   resetKey={formResetKey}
+                  onStepCompleted={(stepIndex) => {
+                    void trackEvent("wizard_step_completed", {
+                      step: stepIndex + 1,
+                    });
+                  }}
                 />
               </>
             )}
@@ -288,11 +343,6 @@ export default function GeneratePage() {
                     emission curve, and running red flag analysis.
                   </p>
                 </div>
-                {streamedText.length > 10 && (
-                  <div className="text-xs text-gray-600 font-mono max-w-sm truncate">
-                    {streamedText.slice(-80)}...
-                  </div>
-                )}
               </div>
             )}
 
@@ -302,13 +352,16 @@ export default function GeneratePage() {
                   setStatus("idle");
                   setResult(null);
                   setError(null);
-                  setStreamedText("");
                   setFormResetKey((value) => value + 1);
                 }}
-                plan={plan}
+                plan={effectivePlan}
                 result={result}
                 onUpgradePreview={() => {
                   setPlan("pro");
+                  void trackEvent("upgrade_completed", {
+                    projectId: activeProjectId,
+                    plan: "pro",
+                  });
                   if (activeProjectId) {
                     void updateProjectPlan(activeProjectId, "pro")
                       .then(() => {
@@ -331,4 +384,30 @@ export default function GeneratePage() {
       </div>
     </div>
   );
+}
+
+function SignupCompletionTracker({ plan }: { plan: PlanTier }) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("signup") !== "1") {
+      return;
+    }
+
+    const trackingKey = "mintomics_signup_completed_tracked";
+    if (typeof window !== "undefined" && window.localStorage.getItem(trackingKey) === "1") {
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(trackingKey, "1");
+    }
+
+    void trackEvent("signup_completed", {
+      surface: "generate",
+      plan,
+    });
+  }, [plan, searchParams]);
+
+  return null;
 }

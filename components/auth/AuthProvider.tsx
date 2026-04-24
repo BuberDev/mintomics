@@ -1,4 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { isClerkConfigured } from "@/lib/auth/config";
 
 interface AuthProviderProps {
@@ -10,5 +11,25 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     return <>{children}</>;
   }
 
-  return <ClerkProvider>{children}</ClerkProvider>;
+  return (
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+        elements: {
+          footer: "hidden",
+          userButtonPopoverFooter: "hidden",
+          navbarMobileMenuRow: "hidden",
+          watermark: "hidden",
+        },
+        variables: {
+          colorPrimary: "white",
+          colorBackground: "#0a0a0a",
+          colorInputBackground: "#171717",
+          colorInputText: "white",
+        },
+      }}
+    >
+      {children}
+    </ClerkProvider>
+  );
 }

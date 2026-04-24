@@ -1,6 +1,6 @@
 function hasRealEnvValue(value: string | undefined) {
   if (!value) return false;
-  return !value.includes("...") && !value.includes("_test_X") && !value.includes("_test_Z");
+  return !value.includes("...") && value !== "pk_test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" && value !== "sk_test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 }
 
 export function isClerkConfigured() {

@@ -1,5 +1,5 @@
 {
-  "name": "tokenforge-ai",
+  "name": "mintomics",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,6 +12,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^0.0.59",
     "@clerk/nextjs": "^5.2.4",
+    "@clerk/themes": "^2.4.57",
     "@radix-ui/react-progress": "^1.1.0",
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slider": "^1.2.0",
@@ -25,9 +26,11 @@
     "jspdf": "^2.5.1",
     "lucide-react": "^0.400.0",
     "next": "14.2.5",
+    "pg": "^8.20.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.12.7",
+    "stripe": "^22.1.0",
     "tailwind-merge": "^2.4.0",
     "three": "^0.165.0",
     "zod": "^3.23.8"

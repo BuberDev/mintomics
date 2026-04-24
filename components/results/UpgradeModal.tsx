@@ -78,7 +78,7 @@ export default function UpgradeModal({
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <a
-            href="/#pricing"
+            href="/pricing"
             className="flex-1 rounded-xl border border-white/15 px-4 py-3 text-center text-sm font-medium text-gray-300 transition-colors hover:border-white/35 hover:text-white"
           >
             View Pricing
@@ -87,7 +87,7 @@ export default function UpgradeModal({
             onClick={onUnlockPreview}
             className="flex-1 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100"
           >
-            Unlock Pro Preview
+            Unlock Pro
           </button>
         </div>
       </div>

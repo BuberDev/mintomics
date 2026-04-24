@@ -1,19 +1,12 @@
-import { sql } from "@vercel/postgres";
 import type {
   PlanTier,
   SavedTokenomicsProject,
   TokenomicsInput,
   TokenomicsOutput,
 } from "@/types/mintomics";
+import { getPostgresSql, isPostgresConfigured } from "@/lib/db/postgres";
 
-function hasRealEnvValue(value: string | undefined) {
-  if (!value) return false;
-  return !value.includes("...");
-}
-
-export function isPostgresConfigured() {
-  return hasRealEnvValue(process.env.POSTGRES_URL);
-}
+export { isPostgresConfigured } from "@/lib/db/postgres";
 
 type ProjectRow = {
   id: string;
@@ -33,8 +26,10 @@ async function ensureProjectsTable() {
   }
 
   setupPromise = (async () => {
-    await sql`
-      CREATE TABLE IF NOT EXISTS tokenforge_projects (
+    const db = await getPostgresSql();
+
+    await db.sql`
+      CREATE TABLE IF NOT EXISTS Mintomics_projects (
         id TEXT PRIMARY KEY,
         owner_id TEXT NOT NULL,
         input_json JSONB NOT NULL,
@@ -43,11 +38,10 @@ async function ensureProjectsTable() {
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
-    `;
-
-    await sql`
-      CREATE INDEX IF NOT EXISTS tokenforge_projects_owner_updated_idx
-      ON tokenforge_projects (owner_id, updated_at DESC)
+    `; 
+    await db.sql`
+      CREATE INDEX IF NOT EXISTS Mintomics_projects_owner_updated_idx
+      ON Mintomics_projects (owner_id, updated_at DESC)
     `;
   })();
 
@@ -76,10 +70,11 @@ function createProjectId() {
 
 export async function listProjects(ownerId: string) {
   await ensureProjectsTable();
+  const db = await getPostgresSql();
 
-  const { rows } = await sql<ProjectRow>`
+  const { rows } = await db.sql<ProjectRow>`
     SELECT id, owner_id, input_json, result_json, plan, created_at, updated_at
-    FROM tokenforge_projects
+    FROM Mintomics_projects
     WHERE owner_id = ${ownerId}
     ORDER BY updated_at DESC
   `;
@@ -101,11 +96,12 @@ export async function upsertProject({
   plan: PlanTier;
 }) {
   await ensureProjectsTable();
+  const db = await getPostgresSql();
 
   const id = projectId || createProjectId();
 
-  const { rows } = await sql<ProjectRow>`
-    INSERT INTO tokenforge_projects (id, owner_id, input_json, result_json, plan, updated_at)
+  const { rows } = await db.sql<ProjectRow>`
+    INSERT INTO Mintomics_projects (id, owner_id, input_json, result_json, plan, updated_at)
     VALUES (
       ${id},
       ${ownerId},
@@ -129,9 +125,10 @@ export async function upsertProject({
 
 export async function deleteProject(ownerId: string, projectId: string) {
   await ensureProjectsTable();
+  const db = await getPostgresSql();
 
-  await sql`
-    DELETE FROM tokenforge_projects
+  await db.sql`
+    DELETE FROM Mintomics_projects
     WHERE id = ${projectId} AND owner_id = ${ownerId}
   `;
 }
@@ -146,9 +143,10 @@ export async function updateProjectPlanRecord({
   plan: PlanTier;
 }) {
   await ensureProjectsTable();
+  const db = await getPostgresSql();
 
-  const { rows } = await sql<ProjectRow>`
-    UPDATE tokenforge_projects
+  const { rows } = await db.sql<ProjectRow>`
+    UPDATE Mintomics_projects
     SET plan = ${plan}, updated_at = NOW()
     WHERE id = ${projectId} AND owner_id = ${ownerId}
     RETURNING id, owner_id, input_json, result_json, plan, created_at, updated_at

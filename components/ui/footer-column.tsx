@@ -12,11 +12,11 @@ import Link from "next/link";
 import BrandLogo from "@/components/ui/brand-logo";
 
 const data = {
-  facebookLink: "https://facebook.com/tokenforgeai",
-  instaLink: "https://instagram.com/tokenforgeai",
-  twitterLink: "https://twitter.com/tokenforgeai",
-  githubLink: "https://github.com/tokenforge-ai",
-  dribbbleLink: "https://dribbble.com/tokenforgeai",
+  facebookLink: "https://facebook.com/Mintomicsai",
+  instaLink: "https://instagram.com/Mintomicsai",
+  twitterLink: "https://twitter.com/Mintomicsai",
+  githubLink: "https://github.com/Mintomics-ai",
+  dribbbleLink: "https://dribbble.com/Mintomicsai",
   services: {
     simulator: "/generate",
     reports: "/generate",
@@ -26,16 +26,16 @@ const data = {
   about: {
     product: "/#features",
     workflow: "/#process",
-    pricing: "/#pricing",
+    pricing: "/pricing",
     roadmap: "/#readiness",
   },
   help: {
-    faqs: "/#faq",
-    support: "mailto:hello@tokenforge.ai",
+    faqs: "/pricing",
+    support: "mailto:hello@Mintomics.ai",
     livechat: "/generate",
   },
   contact: {
-    email: "hello@tokenforge.ai",
+    email: "hello@Mintomics.ai",
     phone: "+48 600 000 000",
     address: "Warsaw, Poland",
   },
@@ -177,17 +177,20 @@ export default function Footer4Col() {
               <ul className="mt-6 space-y-4 text-sm">
                 {contactInfo.map(({ icon: Icon, text, href, isAddress }) => (
                   <li key={text}>
-                    <Link
-                      className="flex items-center justify-center gap-2 text-gray-400 transition hover:text-white sm:justify-start"
-                      href={href}
-                    >
-                      <Icon className="size-4 shrink-0 text-white/75" />
-                      {isAddress ? (
+                    {isAddress ? (
+                      <div className="flex items-center justify-center gap-2 text-gray-400 sm:justify-start">
+                        <Icon className="size-4 shrink-0 text-white/75" />
                         <address className="not-italic">{text}</address>
-                      ) : (
+                      </div>
+                    ) : (
+                      <Link
+                        className="flex items-center justify-center gap-2 text-gray-400 transition hover:text-white sm:justify-start"
+                        href={href}
+                      >
+                        <Icon className="size-4 shrink-0 text-white/75" />
                         <span>{text}</span>
-                      )}
-                    </Link>
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -200,9 +203,18 @@ export default function Footer4Col() {
             <p className="text-sm text-gray-500">
               Not financial advice. Final token design should be reviewed by legal and token engineering specialists.
             </p>
-            <p className="text-sm text-gray-500">
-              &copy; 2026 {data.company.name}
-            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-500 sm:justify-end">
+              <Link href="/terms" className="transition hover:text-white">
+                Terms
+              </Link>
+              <Link href="/privacy" className="transition hover:text-white">
+                Privacy
+              </Link>
+              <Link href="/disclaimer" className="transition hover:text-white">
+                Disclaimer
+              </Link>
+              <span>&copy; 2026 {data.company.name}</span>
+            </div>
           </div>
         </div>
       </div>

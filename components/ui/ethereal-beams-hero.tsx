@@ -7,8 +7,6 @@ import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import { ArrowRight, Star } from "lucide-react";
-import AuthControls from "@/components/auth/AuthControls";
-import BrandLogo from "@/components/ui/brand-logo";
 
 type UniformValue = THREE.IUniform<unknown> | unknown;
 
@@ -450,109 +448,69 @@ export default function EtherealBeamsHero() {
         />
       </div>
 
-      <nav className="relative z-20 w-full">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
-              <Link href="/" className="inline-flex items-center">
-                <BrandLogo
-                  variant="wordmark"
-                  alt="Mintomics"
-                  className="h-10 rounded-[1.15rem] px-3.5 py-2.5 shadow-[0_18px_40px_rgba(0,0,0,0.3)]"
-                />
-              </Link>
-            </div>
-
-            <div className="hidden items-center space-x-1 rounded-full border border-white/10 bg-white/5 p-1 backdrop-blur-xl md:flex">
-              <Link
-                href="/"
-                className="rounded-full px-4 py-2 text-sm font-medium text-white/90 transition-all hover:bg-white/10 hover:text-white"
-              >
-                Home
-              </Link>
-              <Link
-                href="#features"
-                className="rounded-full px-4 py-2 text-sm font-medium text-white/90 transition-all hover:bg-white/10 hover:text-white"
-              >
-                Features
-              </Link>
-              <Link
-                href="#process"
-                className="rounded-full px-4 py-2 text-sm font-medium text-white/90 transition-all hover:bg-white/10 hover:text-white"
-              >
-                Workflow
-              </Link>
-              <Link
-                href="#pricing"
-                className="rounded-full px-4 py-2 text-sm font-medium text-white/90 transition-all hover:bg-white/10 hover:text-white"
-              >
-                Pricing
-              </Link>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <ButtonLink variant="ghost" size="sm" className="hidden sm:flex md:hidden" href="/generate">
-                Open Dashboard
-              </ButtonLink>
-              <ButtonLink size="sm" className="md:hidden" href="/sign-up">
-                Start Free
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </ButtonLink>
-              <div className="hidden md:block">
-                <AuthControls mode="landing" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center">
+      <div className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center pt-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <div className="mb-8 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/90 backdrop-blur-xl">
               <Star className="mr-2 h-4 w-4 text-white" />
-              {"Professional mintomics in under 60 seconds"}
+              {"Private beta for serious token design teams"}
             </div>
 
             <h1 className="mb-6 text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Investor-ready{" "}
+              Investor-ready tokenomics{" "}
               <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
-                mintomics
+                without the spreadsheet drag
               </span>{" "}
-              for your Web3 project
               <br />
-              without hiring a token engineer
+              for your Web3 project
             </h1>
 
             <p className="mx-auto mb-10 max-w-3xl text-lg leading-8 text-white/80 sm:text-xl lg:text-2xl">
               Generate allocation logic, vesting schedules, emission curves, sell-pressure analysis, and investor red
-              flags in one focused workflow.
+              flags in one focused workflow built for founders, operators, and advisors.
             </p>
+
+            <div className="mx-auto mb-10 flex max-w-3xl flex-wrap items-center justify-center gap-3 text-xs font-medium text-white/70">
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-xl">
+                Free workspace starts immediately
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-xl">
+                Pro and Agency require sign-up first
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-xl">
+                Investor-ready PDF export on Pro+
+              </span>
+            </div>
 
             <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <ButtonLink size="lg" className="font-semibold shadow-2xl shadow-white/25" href="/generate">
-                Generate Tokenomics
+                Start Free Workspace
                 <ArrowRight className="ml-2 h-5 w-5" />
               </ButtonLink>
-              <ButtonLink variant="outline" size="lg" className="bg-transparent font-semibold" href="#features">
-                See How It Works
+              <ButtonLink variant="outline" size="lg" className="bg-transparent font-semibold" href="#pricing">
+                View Pricing
               </ButtonLink>
             </div>
 
             <div className="mx-auto grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-3">
               <div className="text-center">
                 <div className="mb-2 text-3xl font-bold text-white">60s</div>
-                <div className="text-sm text-white/60">Average generation time</div>
+                <div className="text-sm text-white/60">Average first draft</div>
               </div>
               <div className="text-center">
                 <div className="mb-2 text-3xl font-bold text-white">$49/mo</div>
-                <div className="text-sm text-white/60">Pro plan target price</div>
+                <div className="text-sm text-white/60">Pro starts at</div>
               </div>
               <div className="text-center">
                 <div className="mb-2 text-3xl font-bold text-white">100x</div>
-                <div className="text-sm text-white/60">Cheaper than token engineering</div>
+                <div className="text-sm text-white/60">Cheaper than custom token work</div>
               </div>
             </div>
+
+            <p className="mx-auto mt-8 max-w-2xl text-sm leading-7 text-white/55">
+              Free access gets you moving quickly. When you need PDF export, project history, or team-grade billing,
+              the checkout flow opens after a quick account step.
+            </p>
           </div>
         </div>
       </div>

@@ -59,7 +59,10 @@ export default function ProjectHistorySidebar({
 
         {projects.length === 0 ? (
           <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-gray-400">
-            Generate your first model and it will appear here for quick reload and iteration.
+            <p className="font-medium text-white">Nothing saved yet</p>
+            <p className="mt-2 leading-7">
+              Your next generation will be stored here automatically so you can reopen, compare, and iterate without rebuilding the brief.
+            </p>
           </div>
         ) : (
           <div className="mt-4 space-y-3">

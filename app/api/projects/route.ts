@@ -28,7 +28,7 @@ export async function GET() {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("[TokenForge] Failed to list projects:", error);
+    console.error("[Mintomics] Failed to list projects:", error);
     return new Response(JSON.stringify({ error: "Failed to load projects." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("[TokenForge] Failed to save project:", error);
+    console.error("[Mintomics] Failed to save project:", error);
     return new Response(JSON.stringify({ error: "Failed to save project." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

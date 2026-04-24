@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createDefaultTokenomicsInput } from "@/lib/mintomics/defaultInput";
 import type { TokenomicsInput, ProjectType, FundingStage } from "@/types/mintomics";
 
@@ -9,6 +9,7 @@ interface Props {
   onSubmit: (input: TokenomicsInput) => void;
   isLoading: boolean;
   resetKey?: string | number;
+  onStepCompleted?: (stepIndex: number) => void;
 }
 
 const STEPS = ["Project Basics", "Token Supply & Funding", "Allocation & Vesting"];
@@ -31,6 +32,7 @@ export default function TokenomicsForm({
   onSubmit,
   isLoading,
   resetKey,
+  onStepCompleted,
 }: Props) {
   const [step, setStep] = useState(0);
   const [values, setValues] = useState<TokenomicsInput>(
@@ -41,6 +43,49 @@ export default function TokenomicsForm({
     setValues(initialValues ?? createDefaultTokenomicsInput());
     setStep(0);
   }, [initialValues, resetKey]);
+
+  const allocationTotal = useMemo(
+    () =>
+      values.teamPercent +
+      values.investorsPercent +
+      values.communityPercent +
+      values.treasuryPercent +
+      values.ecosystemPercent +
+      values.publicSalePercent,
+    [
+      values.teamPercent,
+      values.investorsPercent,
+      values.communityPercent,
+      values.treasuryPercent,
+      values.ecosystemPercent,
+      values.publicSalePercent,
+    ],
+  );
+
+  const allocationTotalValid = allocationTotal <= 100;
+
+  const vestingFields = [
+    {
+      key: "teamCliffMonths",
+      label: "Team Cliff (months)",
+      tooltip: "How long core team tokens stay locked before vesting starts.",
+    },
+    {
+      key: "teamVestingMonths",
+      label: "Team Vesting (months)",
+      tooltip: "How long it takes for the team allocation to unlock linearly.",
+    },
+    {
+      key: "investorCliffMonths",
+      label: "Investor Cliff (months)",
+      tooltip: "How long investor tokens stay locked before vesting starts.",
+    },
+    {
+      key: "investorVestingMonths",
+      label: "Investor Vesting (months)",
+      tooltip: "How long it takes for investor tokens to unlock linearly.",
+    },
+  ] as const;
 
   const set = (key: keyof TokenomicsInput, value: string | number) =>
     setValues((v) => ({ ...v, [key]: value }));
@@ -55,7 +100,11 @@ export default function TokenomicsForm({
     values.tokenPriceUsd > 0 &&
     values.targetRaiseUsd > 0;
 
-  const canSubmit = isStep0Valid && isStep1Valid && values.mainUseCase.trim().length > 5;
+  const canSubmit =
+    isStep0Valid &&
+    isStep1Valid &&
+    allocationTotalValid &&
+    values.mainUseCase.trim().length > 5;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -84,7 +133,11 @@ export default function TokenomicsForm({
       {/* Step 0 — Project Basics */}
       {step === 0 && (
         <div className="space-y-5">
-          <Field label="Project Name" required>
+          <Field
+            label="Project Name"
+            required
+            tooltip="The public name of the project, for example LiquidSwap Protocol."
+          >
             <input
               type="text"
               value={values.projectName}
@@ -105,7 +158,11 @@ export default function TokenomicsForm({
             />
           </Field>
 
-          <Field label="Project Type" required>
+          <Field
+            label="Project Type"
+            required
+            tooltip="Pick the closest category. It helps the AI apply the right token benchmarks."
+          >
             <select
               value={values.projectType}
               onChange={(e) => set("projectType", e.target.value as ProjectType)}
@@ -145,7 +202,11 @@ export default function TokenomicsForm({
                 className="input-field"
               />
             </Field>
-            <Field label="Funding Stage" required>
+            <Field
+              label="Funding Stage"
+              required
+              tooltip="Choose the funding phase that best matches your project right now."
+            >
               <select
                 value={values.fundingStage}
                 onChange={(e) => set("fundingStage", e.target.value as FundingStage)}
@@ -179,7 +240,10 @@ export default function TokenomicsForm({
             </Field>
           </div>
 
-          <Field label="Months Until TGE" tooltip="When do you plan to launch the token? (Token Generation Event)">
+          <Field
+            label="Months Until TGE"
+            tooltip="How many months until the token launch. TGE means Token Generation Event."
+          >
             <input
               type="number"
               value={values.launchTimelineMonths}
@@ -209,9 +273,29 @@ export default function TokenomicsForm({
       {/* Step 2 — Allocation & Vesting */}
       {step === 2 && (
         <div className="space-y-6">
-          <div className="bg-white/5 border border-white/15 rounded-lg p-4 text-sm text-gray-300">
-            💡 Leave all values at 0 to let AI recommend optimal allocation based on your project type.
-            Or enter your preferences and we'll validate them.
+          <div className="rounded-lg border border-white/15 bg-white/5 p-4 text-sm text-gray-300">
+            💡 Leave all values at 0 to let AI recommend the allocation mix.
+            If you enter preferences, the combined total must stay at or below 100%.
+          </div>
+
+          <div
+            className={`rounded-lg border p-4 text-sm ${
+              allocationTotalValid
+                ? "border-white/15 bg-white/5 text-gray-300"
+                : "border-red-500/30 bg-red-500/10 text-red-200"
+            }`}
+          >
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="font-medium">
+                Allocation preference total: {allocationTotal.toFixed(1)}%
+              </p>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/60">
+                {allocationTotalValid ? "Within limit" : "Over 100%"}
+              </p>
+            </div>
+            <p className="mt-2 text-xs leading-6 opacity-90">
+              0% means “let AI decide.” If you define a split, we validate it before generation.
+            </p>
           </div>
 
           <div>
@@ -225,7 +309,11 @@ export default function TokenomicsForm({
                 ["ecosystemPercent", "Ecosystem"],
                 ["publicSalePercent", "Public Sale"],
               ].map(([key, label]) => (
-                <Field key={key} label={label} tooltip={`0 = let AI decide`}>
+                <Field
+                  key={key}
+                  label={label}
+                  tooltip="0 means let the AI decide this bucket."
+                >
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
@@ -244,14 +332,10 @@ export default function TokenomicsForm({
 
           <div>
             <h3 className="text-white font-medium mb-3">Vesting Preferences</h3>
+            {/* These defaults let founders express lock-up preferences in plain language. */}
             <div className="grid grid-cols-2 gap-3">
-              {[
-                ["teamCliffMonths", "Team Cliff (months)"],
-                ["teamVestingMonths", "Team Vesting (months)"],
-                ["investorCliffMonths", "Investor Cliff (months)"],
-                ["investorVestingMonths", "Investor Vesting (months)"],
-              ].map(([key, label]) => (
-                <Field key={key} label={label}>
+              {vestingFields.map(({ key, label, tooltip }) => (
+                <Field key={key} label={label} tooltip={tooltip}>
                   <input
                     type="number"
                     value={values[key as keyof TokenomicsInput] as number}
@@ -280,7 +364,10 @@ export default function TokenomicsForm({
 
         {step < STEPS.length - 1 ? (
           <button
-            onClick={() => setStep(step + 1)}
+            onClick={() => {
+              onStepCompleted?.(step);
+              setStep(step + 1);
+            }}
             disabled={step === 0 ? !isStep0Valid : !isStep1Valid}
             className="flex-1 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed text-black py-3 rounded-xl font-semibold transition-colors"
           >

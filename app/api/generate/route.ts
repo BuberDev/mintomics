@@ -1,11 +1,9 @@
-import { streamText } from "ai";
+import { generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { NextRequest } from "next/server";
 import { TOKENOMICS_SYSTEM_PROMPT, buildUserPrompt } from "@/lib/ai/prompts";
-import {
-  TokenomicsOutputSchema,
-  validateAllocationSumsTo100,
-} from "@/lib/ai/schema";
+import { normalizeTokenomicsOutput } from "@/lib/ai/normalize";
+import { TokenomicsInputSchema, TokenomicsOutputSchema } from "@/lib/ai/schema";
 import type { TokenomicsInput } from "@/types/mintomics";
 
 // ─── Vercel streaming config ─────────────────────────────────────────────────
@@ -59,50 +57,53 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const input: TokenomicsInput = await req.json();
-
-    // Basic input validation
-    if (!input.projectName || !input.tokenSymbol || !input.totalSupply) {
+    const rawInput = (await req.json()) as unknown;
+    const validatedInput = TokenomicsInputSchema.safeParse(rawInput);
+    if (!validatedInput.success) {
       return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
+        JSON.stringify({
+          error: "Invalid project input.",
+          issues: validatedInput.error.issues,
+        }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const userPrompt = buildUserPrompt(input);
+    const input: TokenomicsInput = validatedInput.data;
 
-    // ── STREAMING RESPONSE ─────────────────────────────────────────────────
-    // streamText from Vercel AI SDK handles the streaming protocol.
-    // The client receives tokens as they arrive — no timeout issues.
-    const modelId = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash-lite:nitro";
-    const result = await streamText({
+    const userPrompt = buildUserPrompt(input);
+    const modelId = process.env.OPENROUTER_MODEL || "anthropic/claude-3.5-sonnet";
+
+    const result = await generateText({
       model: openrouter(modelId),
       system: TOKENOMICS_SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
-      temperature: 0.3,   // Lower = more consistent/predictable JSON output
-      maxTokens: 8000,    // Tokenomics output can be large (48 months of data)
-      onFinish: async ({ text }) => {
-        // Post-stream validation — log issues server-side
-        try {
-          const parsed = parsePossiblyWrappedJson(text);
-          const validated = TokenomicsOutputSchema.safeParse(parsed);
-          if (!validated.success) {
-            console.error("[TokenForge] Schema validation failed:", validated.error.issues);
-          }
-          if (!validateAllocationSumsTo100(parsed.allocation ?? [])) {
-            console.error("[TokenForge] Allocation does not sum to 100");
-          }
-        } catch (e) {
-          console.error("[TokenForge] Failed to parse AI output:", e);
-        }
-      },
+      temperature: 0.2,
+      maxTokens: 9000,
     });
 
-    // Return streaming response — Vercel AI SDK formats this correctly
-    return result.toDataStreamResponse();
+    let normalizedOutput: unknown;
+
+    try {
+      const parsed = parsePossiblyWrappedJson(result.text);
+      const validated = TokenomicsOutputSchema.safeParse(parsed);
+      if (!validated.success) {
+        console.error("[Mintomics] AI schema validation failed:", validated.error.issues);
+      }
+
+      normalizedOutput = normalizeTokenomicsOutput(input, validated.success ? validated.data : null);
+    } catch (error) {
+      console.error("[Mintomics] Failed to parse AI output, using deterministic fallback:", error);
+      normalizedOutput = normalizeTokenomicsOutput(input, null);
+    }
+
+    return new Response(JSON.stringify(normalizedOutput), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
 
   } catch (error) {
-    console.error("[TokenForge] API error:", error);
+    console.error("[Mintomics] API error:", error);
 
     const statusCode =
       typeof error === "object" && error !== null && "statusCode" in error
