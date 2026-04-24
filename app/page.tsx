@@ -4,7 +4,6 @@ import {
   CandlestickChart,
   Layers3,
 } from "lucide-react";
-import Footer4Col from "@/components/ui/footer-column";
 import FooterNewsletter from "@/components/ui/demo";
 import EtherealBeamsHero from "@/components/ui/ethereal-beams-hero";
 import SiteHeader from "@/components/ui/site-header";
@@ -228,7 +227,6 @@ export default function LandingPage() {
       </section>
 
       <FooterNewsletter />
-      <Footer4Col />
     </main>
   );
 }

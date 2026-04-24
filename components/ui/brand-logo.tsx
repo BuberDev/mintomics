@@ -56,7 +56,7 @@ export default function BrandLogo({
   if (variant === "icon") {
     return (
       <span
-        className={`${sharedWrapper} rounded-2xl px-2 py-2 ${className}`}
+        className={`inline-flex items-center justify-center overflow-hidden rounded-2xl bg-white/[0.05] px-2 py-2 backdrop-blur-xl ${className}`}
         style={style}
         role="img"
         aria-label={alt}
@@ -68,7 +68,7 @@ export default function BrandLogo({
 
   return (
     <span
-      className={`${sharedWrapper} rounded-full px-4 py-2.5 ${className}`}
+      className={`inline-flex items-center gap-2.5 px-1 py-1 ${className}`}
       style={style}
       role="img"
       aria-label={alt}

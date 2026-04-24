@@ -448,7 +448,7 @@ export default function EtherealBeamsHero() {
         />
       </div>
 
-      <div className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center pt-20">
+      <div className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center pt-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <div className="mb-8 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/90 backdrop-blur-xl">

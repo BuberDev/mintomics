@@ -83,8 +83,9 @@ export default function SiteHeader() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
         
         <div className={cn(
-          "fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-black px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-white/10 transition-transform duration-300 ease-in-out",
-          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+          "fixed inset-y-0 right-0 z-50 w-full overflow-y-auto px-6 py-6 sm:max-w-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+          "bg-white/[0.03] backdrop-blur-3xl border-l border-white/10 shadow-[-20px_0_50px_rgba(0,0,0,0.3)]",
+          mobileMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
         )}>
           <div className="flex items-center justify-between">
             <Link href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
@@ -112,7 +113,7 @@ export default function SiteHeader() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-white/5 transition-colors"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white/90 hover:bg-white/10 hover:text-white transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.name}
