@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { resolveOwnerId } from "@/lib/auth/owner";
 import { getBillingState, isPostgresConfigured } from "@/lib/db/billing";
 import { getStripe } from "@/lib/stripe";
+import { getCurrentUserId } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 
@@ -20,7 +20,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const ownerId = await resolveOwnerId();
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const billing = await getBillingState(ownerId);
 
     if (!billing.stripeCustomerId) {

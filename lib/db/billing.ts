@@ -87,6 +87,20 @@ export async function getBillingState(ownerId: string) {
   return toBillingState(rows[0] ?? null);
 }
 
+export async function findBillingOwnerIdByStripeCustomerId(stripeCustomerId: string) {
+  await ensureBillingTable();
+  const db = await getPostgresSql();
+
+  const { rows } = await db.sql<{ owner_id: string }>`
+    SELECT owner_id
+    FROM Mintomics_billing
+    WHERE stripe_customer_id = ${stripeCustomerId}
+    LIMIT 1
+  `;
+
+  return rows[0]?.owner_id ?? null;
+}
+
 export async function upsertBillingState({
   ownerId,
   plan,

@@ -11,8 +11,6 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.59",
-    "@clerk/nextjs": "^5.2.4",
-    "@clerk/themes": "^2.4.57",
     "@radix-ui/react-progress": "^1.1.0",
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slider": "^1.2.0",

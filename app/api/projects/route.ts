@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { listProjects, isPostgresConfigured, upsertProject } from "@/lib/db/projects";
-import { resolveOwnerId } from "@/lib/auth/owner";
+import { getCurrentUserId } from "@/lib/auth/session";
 import type { PlanTier, TokenomicsInput, TokenomicsOutput } from "@/types/mintomics";
 
 export const runtime = "nodejs";
@@ -20,7 +20,13 @@ export async function GET() {
   }
 
   try {
-    const ownerId = await resolveOwnerId();
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const projects = await listProjects(ownerId);
 
     return new Response(JSON.stringify({ projects }), {
@@ -56,7 +62,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const ownerId = await resolveOwnerId();
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const project = await upsertProject({
       ownerId,
       projectId: body.projectId,

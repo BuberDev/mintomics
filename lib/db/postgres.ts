@@ -1,6 +1,6 @@
 import { Pool, type QueryResultRow } from "pg";
 
-type Primitive = string | number | boolean | null | undefined;
+type Primitive = string | number | boolean | null | undefined | Date;
 
 type SqlClient = {
   sql: <O extends QueryResultRow>(

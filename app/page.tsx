@@ -9,8 +9,7 @@ import EtherealBeamsHero from "@/components/ui/ethereal-beams-hero";
 import SiteHeader from "@/components/ui/site-header";
 import TrackPageView from "@/components/analytics/TrackPageView";
 import PricingTiers from "@/components/pricing/PricingTiers";
-import { auth } from "@clerk/nextjs/server";
-import { isClerkConfigured } from "@/lib/auth/config";
+import { getCurrentAuth } from "@/lib/auth/session";
 
 const featureCards = [
   {
@@ -69,8 +68,8 @@ const testimonials = [
   },
 ] as const;
 
-export default function LandingPage() {
-  const isSignedIn = isClerkConfigured() ? Boolean(auth().userId) : false;
+export default async function LandingPage() {
+  const isSignedIn = Boolean(await getCurrentAuth());
 
   return (
     <main className="min-h-screen overflow-hidden bg-black text-gray-100">

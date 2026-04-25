@@ -5,6 +5,7 @@ import { TOKENOMICS_SYSTEM_PROMPT, buildUserPrompt } from "@/lib/ai/prompts";
 import { normalizeTokenomicsOutput } from "@/lib/ai/normalize";
 import { TokenomicsInputSchema, TokenomicsOutputSchema } from "@/lib/ai/schema";
 import type { TokenomicsInput } from "@/types/mintomics";
+import { getCurrentUserId } from "@/lib/auth/session";
 
 // ─── Vercel streaming config ─────────────────────────────────────────────────
 // This tells Vercel to use streaming — no 10s serverless timeout applies.
@@ -57,6 +58,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const rawInput = (await req.json()) as unknown;
     const validatedInput = TokenomicsInputSchema.safeParse(rawInput);
     if (!validatedInput.success) {

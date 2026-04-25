@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { resolveOwnerId } from "@/lib/auth/owner";
+import { getCurrentUserId } from "@/lib/auth/session";
 import { getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
@@ -50,7 +50,13 @@ export async function GET(req: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? req.nextUrl.origin;
   const stripe = getStripe();
   const priceId = getPriceId(selectedCycle)!;
-  const ownerId = await resolveOwnerId();
+  const ownerId = await getCurrentUserId();
+  if (!ownerId) {
+    return new Response(JSON.stringify({ error: "Unauthorized." }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",

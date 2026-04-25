@@ -2,9 +2,8 @@ import Link from "next/link";
 import AuthControls from "@/components/auth/AuthControls";
 import TrackPageView from "@/components/analytics/TrackPageView";
 import PricingTiers from "@/components/pricing/PricingTiers";
-import { auth } from "@clerk/nextjs/server";
-import { isClerkConfigured } from "@/lib/auth/config";
 import { ArrowRight, CircleDollarSign, LockKeyhole, UserPlus2 } from "lucide-react";
+import { getCurrentAuth } from "@/lib/auth/session";
 
 type PricingPageProps = {
   searchParams?: {
@@ -14,8 +13,8 @@ type PricingPageProps = {
   };
 };
 
-export default function PricingPage({ searchParams }: PricingPageProps) {
-  const isSignedIn = isClerkConfigured() ? Boolean(auth().userId) : false;
+export default async function PricingPage({ searchParams }: PricingPageProps) {
+  const isSignedIn = Boolean(await getCurrentAuth());
   const billingMissing = searchParams?.billing === "missing";
   const selectedCycle = searchParams?.cycle === "annual" ? "annual" : "monthly";
   const missingKeys = (searchParams?.missing ?? "")

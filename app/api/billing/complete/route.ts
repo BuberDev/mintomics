@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { resolveOwnerId } from "@/lib/auth/owner";
 import { upsertBillingState } from "@/lib/db/billing";
 import { getStripe } from "@/lib/stripe";
+import { getCurrentUserId } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 
@@ -39,7 +39,13 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const ownerId = session.client_reference_id || (await resolveOwnerId());
+    const ownerId = session.client_reference_id || (await getCurrentUserId());
+    if (!ownerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     let stripeInvoiceUrl: string | null = null;
     if (typeof session.invoice === "string") {
       try {

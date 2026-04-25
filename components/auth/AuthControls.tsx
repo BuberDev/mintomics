@@ -1,47 +1,110 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { isClerkPublishableKeyConfigured } from "@/lib/auth/config";
+import { Loader2 } from "lucide-react";
 import { trackEvent } from "@/lib/analytics/client";
 import { cn } from "@/lib/utils";
+
+type AuthUser = {
+  id: string;
+  email: string;
+  displayName: string;
+  avatarUrl: string | null;
+};
 
 interface AuthControlsProps {
   mode?: "landing" | "app" | "mobile";
 }
 
-const isClerkEnabled = isClerkPublishableKeyConfigured();
-
 export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
   const pathname = usePathname();
+  const [user, setUser] = useState<AuthUser | null | undefined>(undefined);
 
-  if (!isClerkEnabled) {
+  useEffect(() => {
+    let cancelled = false;
+
+    void fetch("/api/auth/me", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) {
+          return null;
+        }
+
+        return response.json() as Promise<{ user: AuthUser | null }>;
+      })
+      .then((payload) => {
+        if (!cancelled) {
+          setUser(payload?.user ?? null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setUser(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const linkClassName = cn(
+    "text-sm font-medium transition-colors",
+    mode === "landing"
+      ? "text-gray-300 hover:text-white"
+      : mode === "app"
+        ? "rounded-lg border border-white/15 px-3 py-2 text-gray-300 hover:border-white/35 hover:text-white"
+        : "rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5",
+  );
+
+  const primaryButtonClassName = cn(
+    "rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-all hover:bg-gray-100 hover:scale-105 active:scale-95 text-center",
+    mode === "mobile" && "w-full py-3 text-base",
+  );
+
+  const secondaryButtonClassName = cn(
+    "rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5",
+    mode === "mobile" && "w-full",
+  );
+
+  const handleSignOut = async () => {
+    try {
+      await fetch("/api/auth/sign-out", { method: "POST" });
+      setUser(null);
+      window.location.assign("/");
+    } catch {
+      window.location.assign("/");
+    }
+  };
+
+  if (user === undefined) {
     return (
-      <div className={cn("flex items-center gap-3", mode === "mobile" && "flex-col w-full items-stretch")}>
+      <div className="flex items-center gap-3 text-sm text-gray-400">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span>Loading account…</span>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className={cn("flex items-center gap-4", mode === "mobile" && "flex-col w-full items-stretch")}>
         <Link
-          href="/generate"
+          href={pathname.startsWith("/sign-in") ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(pathname)}`}
           onClick={() => {
             void trackEvent("cta_clicked", { surface: "landing", label: "sign_in" });
           }}
-          className={cn(
-            "text-sm font-medium transition-colors",
-            mode === "landing" ? "text-gray-300 hover:text-white" : 
-            mode === "app" ? "rounded-lg border border-white/15 px-3 py-2 text-gray-300 hover:border-white/35 hover:text-white" :
-            "rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5"
-          )}
+          className={linkClassName}
         >
           Sign In
         </Link>
         <Link
-          href="/generate"
+          href={pathname.startsWith("/sign-up") ? "/sign-up" : `/sign-up?redirect_url=${encodeURIComponent(pathname)}`}
           onClick={() => {
             void trackEvent("cta_clicked", { surface: "landing", label: "start_free" });
           }}
-          className={cn(
-            "rounded-full bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-100 text-center",
-            mode === "mobile" && "w-full py-3 text-base"
-          )}
+          className={primaryButtonClassName}
         >
           Start Free
         </Link>
@@ -50,76 +113,32 @@ export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
   }
 
   return (
-    <>
-      <SignedOut>
-        <div className={cn("flex items-center gap-4", mode === "mobile" && "flex-col w-full items-stretch")}>
-          <Link
-            href="/sign-in"
-            onClick={() => {
-              void trackEvent("cta_clicked", { surface: "landing", label: "sign_in" });
-            }}
-            className={cn(
-              "text-sm font-medium transition-colors",
-              mode === "landing" ? "text-gray-300 hover:text-white" : 
-              mode === "app" ? "rounded-lg border border-white/15 px-3 py-2 text-gray-300 hover:border-white/35 hover:text-white" :
-              "rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5"
-            )}
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/sign-up"
-            onClick={() => {
-              void trackEvent("cta_clicked", { surface: "landing", label: "start_free" });
-            }}
-            className={cn(
-              "rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-all hover:bg-gray-100 hover:scale-105 active:scale-95 text-center",
-              mode === "mobile" && "w-full py-3 text-base"
-            )}
-          >
-            Start Free
-          </Link>
-        </div>
-      </SignedOut>
+    <div className={cn("flex items-center gap-4", mode === "mobile" && "flex-col w-full items-stretch")}>
+      {pathname !== "/generate" && (
+        <Link
+          href="/generate"
+          onClick={() => {
+            void trackEvent("cta_clicked", { surface: "app", label: "dashboard" });
+          }}
+          className={linkClassName}
+        >
+          Dashboard
+        </Link>
+      )}
 
-      <SignedIn>
-        <div className={cn("flex items-center gap-4", mode === "mobile" && "flex-col w-full items-stretch")}>
-          {pathname !== "/generate" && (
-            <Link
-              href="/generate"
-              onClick={() => {
-                void trackEvent("cta_clicked", { surface: "app", label: "dashboard" });
-              }}
-              className={cn(
-                "text-sm font-medium transition-colors",
-                mode === "landing" ? "text-gray-300 hover:text-white" : 
-                mode === "app" ? "rounded-lg border border-white/15 px-3 py-2 text-gray-300 hover:border-white/35 hover:text-white" :
-                "rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5"
-              )}
-            >
-              Dashboard
-            </Link>
-          )}
-          
-          {pathname !== "/account" && (
-            <Link
-              href="/account"
-              className={cn(
-                "text-sm font-medium transition-colors",
-                mode === "landing" ? "text-gray-300 hover:text-white" : 
-                mode === "app" ? "rounded-lg border border-white/15 px-3 py-2 text-gray-300 hover:border-white/35 hover:text-white" :
-                "rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5"
-              )}
-            >
-              Account
-            </Link>
-          )}
+      {pathname !== "/account" && (
+        <Link href="/account" className={linkClassName}>
+          Account
+        </Link>
+      )}
 
-          <div className={cn(mode === "mobile" && "flex justify-center py-2")}>
-            <UserButton afterSignOutUrl="/" appearance={{ elements: { userButtonAvatarBox: "h-9 w-9", userButtonPopoverFooter: "hidden" } }} />
-          </div>
-        </div>
-      </SignedIn>
-    </>
+      <button
+        type="button"
+        onClick={() => void handleSignOut()}
+        className={secondaryButtonClassName}
+      >
+        Sign Out
+      </button>
+    </div>
   );
 }

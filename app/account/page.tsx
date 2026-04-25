@@ -1,59 +1,29 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { UserProfile } from "@clerk/nextjs";
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { CreditCard, FileText, ShieldCheck, Sparkles, UserCircle2 } from "lucide-react";
-import { isClerkConfigured } from "@/lib/auth/config";
-import { isPostgresConfigured, getBillingState } from "@/lib/db/billing";
+import { requireCurrentAuth } from "@/lib/auth/session";
+import { getBillingState, isPostgresConfigured } from "@/lib/db/billing";
 import { listProjects } from "@/lib/db/projects";
+import { listOAuthAccountsForUser, listSessionsForUser } from "@/lib/auth/store";
+import SignOutButton from "@/components/auth/SignOutButton";
+import SignOutAllButton from "@/components/auth/SignOutAllButton";
 
 export const runtime = "nodejs";
 
 export default async function AccountPage() {
-  if (!isClerkConfigured()) {
-    return (
-      <main className="min-h-screen bg-black px-6 py-16 text-gray-100">
-        <section className="mx-auto max-w-4xl rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/55">
-            Account
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white">
-            Account management is not configured yet.
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-400">
-            Once Clerk keys are configured, this surface will show profile settings, subscription status, invoice history, and billing portal access.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100"
-            >
-              View pricing
-            </Link>
-            <Link
-              href="/generate"
-              className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
-            >
-              Back to app
-            </Link>
-          </div>
-        </section>
-      </main>
-    );
+  const auth = await requireCurrentAuth("/account");
+
+  if (!auth?.user) {
+    redirect("/sign-in?redirect_url=%2Faccount");
   }
 
-  const { userId } = auth();
-
-  if (!userId) {
-    redirect("/sign-in");
-  }
-
-  const user = await currentUser();
-  const billing = isPostgresConfigured() ? await getBillingState(userId) : null;
-  const projects = isPostgresConfigured() ? await listProjects(userId) : [];
-  const primaryEmail = user?.emailAddresses[0]?.emailAddress ?? "Unavailable";
-  const displayName = user?.fullName || user?.firstName || "Your account";
-  const avatar = user?.imageUrl ?? null;
+  const user = auth.user;
+  const billing = isPostgresConfigured() ? await getBillingState(user.id) : null;
+  const projects = isPostgresConfigured() ? await listProjects(user.id) : [];
+  const sessions = isPostgresConfigured() ? await listSessionsForUser(user.id, auth.session.id) : [];
+  const oauthAccounts = isPostgresConfigured() ? await listOAuthAccountsForUser(user.id) : [];
+  const primaryEmail = user.email ?? "Unavailable";
+  const displayName = user.displayName || "Your account";
   const hasStripeCustomer = Boolean(billing?.stripeCustomerId);
   const billingHref = hasStripeCustomer ? "/api/billing/portal" : "/pricing";
   const billingLabel = hasStripeCustomer ? "Manage billing" : "Upgrade";
@@ -91,10 +61,11 @@ export default async function AccountPage() {
             Account
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white md:text-6xl">
-            Profile, billing, and invoice history in one place.
+            Profile, billing, sessions, and history in one place.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-8 text-gray-400">
-            This is the operational surface for your Mintomics workspace. The account area shows your identity, current plan, payment status, invoices, and the actions needed to manage the subscription cleanly.
+            This is the operational surface for your Mintomics workspace. It shows your identity, billing status,
+            active sessions, and the actions needed to manage the account cleanly.
           </p>
         </div>
 
@@ -146,10 +117,10 @@ export default async function AccountPage() {
                     Account settings
                   </p>
                   <h2 className="mt-3 text-2xl font-semibold text-white">
-                    Manage profile settings with Clerk.
+                    Manage profile and sessions.
                   </h2>
                   <p className="mt-3 max-w-2xl text-sm leading-7 text-gray-400">
-                    Update your name, email, password, sessions, and security settings here. This is the same surface users expect from a serious SaaS account center, not a hidden admin panel.
+                    Sessions are persisted as secure httpOnly cookies. You can review your active devices and sign out from here.
                   </p>
                 </div>
                 <div className="grid gap-3 text-sm text-gray-300">
@@ -160,88 +131,137 @@ export default async function AccountPage() {
                     {billingLabel}
                   </Link>
                   <Link
+                    href="/api/auth/google/link/start"
+                    className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
+                  >
+                    {oauthAccounts.some((account) => account.provider === "google")
+                      ? "Google connected"
+                      : "Link Google account"}
+                  </Link>
+                  <Link
                     href="/pricing"
                     className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
                   >
                     Compare plans
                   </Link>
+                  <SignOutButton />
+                  <SignOutAllButton />
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-2xl border border-white/10 bg-black/25 p-5">
+                <p className="text-sm font-semibold text-white">Active sessions</p>
+                <div className="mt-4 space-y-3">
+                  {sessions.length > 0 ? (
+                    sessions.map((session) => (
+                      <div
+                        key={session.id}
+                        className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-medium text-white">
+                              {session.current ? "Current session" : "Session"}
+                            </p>
+                            <p className="mt-1 text-xs uppercase tracking-[0.22em] text-gray-500">
+                              {session.userAgent ?? "Unknown browser"}
+                            </p>
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            Expires {new Date(session.expiresAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-400">No session data available yet.</p>
+                  )}
                 </div>
               </div>
 
               <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black/25">
-                <UserProfile 
-                  routing="hash" 
-                  appearance={{ 
-                    elements: { 
-                      footer: "hidden",
-                      navbar: {
-                        "& > div:last-child": {
-                          display: "none"
-                        }
-                      }
-                    } 
-                  }} 
-                />
+                <div className="grid gap-4 p-5 md:grid-cols-2">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-5 w-5 text-white/80" />
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-white/50">
+                        Billing cycle
+                      </p>
+                    </div>
+                    <p className="mt-2 text-sm text-white">{cycleLabel}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-5 w-5 text-white/80" />
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-white/50">
+                        Latest invoice
+                      </p>
+                    </div>
+                    {latestInvoiceHref ? (
+                      <Link
+                        href={latestInvoiceHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex text-sm font-medium text-white underline decoration-white/30 underline-offset-4 transition-colors hover:decoration-white/70"
+                      >
+                        Open invoice
+                      </Link>
+                    ) : (
+                      <p className="mt-2 text-sm text-gray-400">
+                        Available after the next successful charge.
+                      </p>
+                    )}
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <p className="text-[11px] uppercase tracking-[0.22em] text-white/50">
+                      Stripe customer
+                    </p>
+                    <p className="mt-2 break-all text-sm text-white">
+                      {billing?.stripeCustomerId ?? "Not created yet"}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <p className="text-[11px] uppercase tracking-[0.22em] text-white/50">
+                      Subscription
+                    </p>
+                    <p className="mt-2 break-all text-sm text-white">
+                      {billing?.stripeSubscriptionId ?? "Not created yet"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                <p className="text-sm font-semibold text-white">Connected accounts</p>
+                <div className="mt-3 space-y-3">
+                  {oauthAccounts.length > 0 ? (
+                    oauthAccounts.map((account) => (
+                      <div
+                        key={account.id}
+                        className="flex items-center justify-between rounded-xl border border-white/10 bg-black/25 px-4 py-3"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-white capitalize">
+                            {account.provider}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {account.providerEmail ?? "No email reported"}
+                          </p>
+                        </div>
+                        <span className="text-xs uppercase tracking-[0.22em] text-gray-500">
+                          Linked
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-400">No external accounts linked yet.</p>
+                  )}
+                </div>
               </div>
             </section>
           </section>
 
           <aside className="space-y-6">
-            <section className="glass-effect rounded-[2rem] border border-white/10 p-6">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/55">
-                Billing snapshot
-              </p>
-              <div className="mt-4 grid gap-3">
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                  <div className="flex items-center gap-3">
-                    <CreditCard className="h-5 w-5 text-white/80" />
-                    <p className="text-[11px] uppercase tracking-[0.22em] text-white/50">
-                      Billing cycle
-                    </p>
-                  </div>
-                  <p className="mt-2 text-sm text-white">{cycleLabel}</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-white/80" />
-                    <p className="text-[11px] uppercase tracking-[0.22em] text-white/50">
-                      Latest invoice
-                    </p>
-                  </div>
-                  {latestInvoiceHref ? (
-                    <Link
-                      href={latestInvoiceHref}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-2 inline-flex text-sm font-medium text-white underline decoration-white/30 underline-offset-4 transition-colors hover:decoration-white/70"
-                    >
-                      Open invoice
-                    </Link>
-                  ) : (
-                    <p className="mt-2 text-sm text-gray-400">
-                      Available in the billing portal after the next successful charge.
-                    </p>
-                  )}
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                  <p className="text-[11px] uppercase tracking-[0.22em] text-white/50">
-                    Stripe customer
-                  </p>
-                  <p className="mt-2 break-all text-sm text-white">
-                    {billing?.stripeCustomerId ?? "Not created yet"}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                  <p className="text-[11px] uppercase tracking-[0.22em] text-white/50">
-                    Subscription
-                  </p>
-                  <p className="mt-2 break-all text-sm text-white">
-                    {billing?.stripeSubscriptionId ?? "Not created yet"}
-                  </p>
-                </div>
-              </div>
-            </section>
-
             <section className="glass-effect rounded-[2rem] border border-white/10 p-6">
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/55">
                 Support
@@ -250,7 +270,7 @@ export default async function AccountPage() {
                 Need help with billing or a custom setup?
               </h2>
               <p className="mt-3 text-sm leading-7 text-gray-400">
-                Use the billing portal for payment methods, cancellations, and invoices. If you need Agency onboarding or a custom workflow, we keep that in a structured sales process.
+                Use the billing portal for payment methods, cancellations, and invoices.
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
                 <Link

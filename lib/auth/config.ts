@@ -1,12 +1,29 @@
+import { isPostgresConfigured as isDbConfigured } from "@/lib/db/postgres";
+
 function hasRealEnvValue(value: string | undefined) {
   if (!value) return false;
-  return !value.includes("...") && value !== "pk_test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" && value !== "sk_test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+  return !value.includes("...");
 }
 
-export function isClerkConfigured() {
-  return hasRealEnvValue(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) && hasRealEnvValue(process.env.CLERK_SECRET_KEY);
+export function isAuthConfigured() {
+  return isDbConfigured() && hasRealEnvValue(process.env.AUTH_SESSION_SECRET);
 }
 
-export function isClerkPublishableKeyConfigured() {
-  return hasRealEnvValue(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+export function isOAuthConfigured() {
+  return (
+    hasRealEnvValue(process.env.GOOGLE_CLIENT_ID) &&
+    hasRealEnvValue(process.env.GOOGLE_CLIENT_SECRET)
+  );
+}
+
+export function getAppUrl(requestUrl?: string) {
+  return process.env.NEXT_PUBLIC_APP_URL ?? requestUrl ?? "http://localhost:3000";
+}
+
+export function getSignInPath() {
+  return "/sign-in";
+}
+
+export function getSignUpPath() {
+  return "/sign-up";
 }

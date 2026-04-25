@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { deleteProject, isPostgresConfigured, updateProjectPlanRecord } from "@/lib/db/projects";
-import { resolveOwnerId } from "@/lib/auth/owner";
+import { getCurrentUserId } from "@/lib/auth/session";
 import type { PlanTier } from "@/types/mintomics";
 
 export const runtime = "nodejs";
@@ -23,7 +23,13 @@ export async function DELETE(
   }
 
   try {
-    const ownerId = await resolveOwnerId();
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     await deleteProject(ownerId, params.projectId);
 
     return new Response(null, { status: 204 });
@@ -53,7 +59,13 @@ export async function PATCH(
       });
     }
 
-    const ownerId = await resolveOwnerId();
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const project = await updateProjectPlanRecord({
       ownerId,
       projectId: params.projectId,

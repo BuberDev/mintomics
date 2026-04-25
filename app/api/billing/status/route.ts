@@ -1,5 +1,5 @@
-import { resolveOwnerId } from "@/lib/auth/owner";
 import { getBillingState, isPostgresConfigured } from "@/lib/db/billing";
+import { getCurrentUserId } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 
@@ -18,7 +18,13 @@ export async function GET() {
   }
 
   try {
-    const ownerId = await resolveOwnerId();
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const billing = await getBillingState(ownerId);
 
     return new Response(JSON.stringify({ billing }), {
