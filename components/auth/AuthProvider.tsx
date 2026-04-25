@@ -11,8 +11,17 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     return <>{children}</>;
   }
 
+  const signInUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in";
+  const signUpUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? "/sign-up";
+  const signInFallbackRedirectUrl = process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL ?? "/generate";
+  const signUpFallbackRedirectUrl = process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL ?? "/generate?signup=1";
+
   return (
     <ClerkProvider
+      signInUrl={signInUrl}
+      signUpUrl={signUpUrl}
+      signInFallbackRedirectUrl={signInFallbackRedirectUrl}
+      signUpFallbackRedirectUrl={signUpFallbackRedirectUrl}
       appearance={{
         baseTheme: dark,
         elements: {

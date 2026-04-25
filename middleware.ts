@@ -12,7 +12,33 @@ const clerkEnabled = isClerkConfigured();
 
 const authMiddleware = clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    await auth().protect();
+    const { userId } = auth();
+
+    if (!userId) {
+      const pathname = req.nextUrl.pathname;
+      const search = req.nextUrl.search;
+      const returnTo = `${pathname}${search}`;
+
+      if (pathname.startsWith("/api/")) {
+        return new NextResponse(
+          JSON.stringify({
+            error: "Unauthorized",
+            redirectUrl: `/sign-in?redirect_url=${encodeURIComponent(returnTo)}`,
+          }),
+          {
+            status: 401,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+      }
+
+      const signInUrl = new URL("/sign-in", req.url);
+      signInUrl.searchParams.set("redirect_url", returnTo);
+
+      return NextResponse.redirect(signInUrl);
+    }
   }
 });
 

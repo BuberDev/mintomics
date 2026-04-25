@@ -6,17 +6,23 @@ import TrackPageView from "@/components/analytics/TrackPageView";
 
 type SignUpPageProps = {
   searchParams?: {
+    redirect_url?: string;
     intent?: string;
     cycle?: string;
   };
 };
 
 function getAfterSignUpUrl(searchParams?: SignUpPageProps["searchParams"]) {
+  const redirectUrl = searchParams?.redirect_url;
   const intent = searchParams?.intent;
   const cycle = searchParams?.cycle === "annual" ? "annual" : "monthly";
 
   if (intent === "upgrade") {
     return `/api/billing?cycle=${cycle}`;
+  }
+
+  if (redirectUrl && redirectUrl.startsWith("/")) {
+    return redirectUrl;
   }
 
   return "/generate?signup=1";
@@ -71,6 +77,9 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
 
         <div className="mx-auto w-full max-w-md">
           <SignUp
+            routing="path"
+            path="/sign-up"
+            signInUrl="/sign-in"
             forceRedirectUrl={getAfterSignUpUrl(searchParams)}
             fallbackRedirectUrl={getAfterSignUpUrl(searchParams)}
             appearance={{ elements: { footer: "hidden" } }}
