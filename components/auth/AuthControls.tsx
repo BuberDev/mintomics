@@ -58,23 +58,23 @@ export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
   }, []);
 
   const linkClassName = cn(
-    "min-h-10 whitespace-nowrap text-sm font-medium transition-colors",
+    "inline-flex shrink-0 items-center justify-center whitespace-nowrap text-sm font-medium leading-none transition-colors",
     mode === "landing"
-      ? "text-gray-300 hover:text-white"
+      ? "h-12 rounded-full px-5 text-gray-300 hover:text-white"
       : mode === "app"
-        ? "inline-flex items-center justify-center rounded-lg border border-white/15 px-3 py-2 text-center text-gray-300 hover:border-white/35 hover:text-white"
-        : "rounded-xl border border-white/10 px-4 py-3 text-center text-white hover:bg-white/5",
+        ? "min-h-10 rounded-lg border border-white/15 px-3 py-2 text-center text-gray-300 hover:border-white/35 hover:text-white"
+        : "min-h-11 rounded-xl border border-white/10 px-4 py-3 text-center text-white hover:bg-white/5",
   );
 
   const primaryButtonClassName = cn(
-    "min-h-11 rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-all hover:bg-gray-100 hover:scale-105 active:scale-95 text-center",
-    mode === "mobile" && "w-full py-3 text-base",
+    "inline-flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-white px-6 text-sm font-semibold leading-none text-black transition-all hover:bg-gray-100 hover:shadow-[0_10px_30px_rgba(255,255,255,0.14)] active:scale-[0.98] text-center",
+    mode === "mobile" && "w-full px-5 text-base",
   );
 
   const secondaryButtonClassName = cn(
-    "min-h-10 rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5",
-    mode === "mobile" && "w-full min-h-11 py-3",
-    mode === "app" && "text-sm font-medium text-gray-200 hover:border-white/25 hover:bg-white/5",
+    "inline-flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-white/10 px-5 text-sm font-medium leading-none text-white transition-colors hover:border-white/20 hover:bg-white/5 text-center",
+    mode === "mobile" && "w-full px-4 text-base",
+    mode === "app" && "h-10 rounded-lg border-white/15 px-3 text-sm text-gray-200 hover:border-white/25 hover:bg-white/5",
   );
 
   const handleSignOut = async () => {
@@ -98,7 +98,16 @@ export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
 
   if (!user) {
     return (
-      <div className={cn("flex w-full flex-col gap-3", mode === "mobile" ? "items-stretch" : "sm:w-auto sm:flex-row sm:flex-wrap sm:items-center")}>
+      <div
+        className={cn(
+          "flex w-full flex-col gap-3",
+          mode === "landing"
+            ? "items-center sm:w-auto sm:flex-row sm:gap-3"
+            : mode === "mobile"
+              ? "items-stretch"
+              : "sm:w-auto sm:flex-row sm:flex-wrap sm:items-center",
+        )}
+      >
         <Link
           href={pathname.startsWith("/sign-in") ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(getDefaultRedirectTarget(pathname))}`}
           onClick={() => {
@@ -128,7 +137,7 @@ export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
           ? "flex w-full flex-col gap-3 items-stretch"
           : mode === "app"
             ? "inline-flex w-auto flex-row flex-wrap items-center justify-end gap-1.5 sm:gap-2"
-            : "flex w-full flex-col gap-3",
+            : "flex w-full flex-col gap-3 items-center sm:w-auto sm:flex-row sm:gap-3",
         mode === "mobile"
           ? ""
           : "",

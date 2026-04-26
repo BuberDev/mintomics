@@ -145,9 +145,9 @@ export default function TokenomicsForm({
   return (
     <div className="mx-auto w-full max-w-2xl">
       {/* Step indicator */}
-      <div className="mb-6 flex items-center gap-1.5 sm:mb-8 sm:gap-2">
+      <div className="mx-auto mb-6 flex w-fit max-w-full items-center justify-center gap-2 sm:mb-8 sm:w-full sm:gap-2">
         {STEPS.map((label, i) => (
-          <div key={i} className="flex items-center gap-2 flex-1">
+          <div key={i} className="flex items-center gap-2 sm:flex-1">
             <div
               className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${i < step ? "bg-white text-black" :
                   i === step ? "border-2 border-white text-white" :
@@ -160,7 +160,7 @@ export default function TokenomicsForm({
               {label}
             </span>
             {i < STEPS.length - 1 && (
-              <div className={`flex-1 h-px ${i < step ? "bg-white/70" : "bg-white/15"}`} />
+              <div className={`h-px w-8 sm:flex-1 ${i < step ? "bg-white/70" : "bg-white/15"}`} />
             )}
           </div>
         ))}

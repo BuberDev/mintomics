@@ -22,9 +22,49 @@ const openrouter = createOpenAI({
   },
 });
 
+const FALLBACK_MODELS = [
+  "deepseek/deepseek-chat-v3.1",
+  "deepseek/deepseek-chat",
+  "deepseek/deepseek-r1-0528",
+  "deepseek/deepseek-r1",
+] as const;
+
 function hasRealOpenRouterKey(value: string | undefined) {
   if (!value) return false;
   return !value.includes("...");
+}
+
+function getCandidateModels(primaryModel: string | undefined) {
+  const candidates = [primaryModel, ...FALLBACK_MODELS].filter(
+    (model): model is string => Boolean(model && model.trim().length > 0),
+  );
+
+  return Array.from(new Set(candidates));
+}
+
+function getStatusCode(error: unknown) {
+  if (typeof error !== "object" || error === null || !("statusCode" in error)) {
+    return undefined;
+  }
+
+  return Number((error as { statusCode: unknown }).statusCode);
+}
+
+function shouldTryNextModel(error: unknown) {
+  const statusCode = getStatusCode(error);
+  const message = error instanceof Error ? error.message : "";
+
+  if (statusCode === 401 || statusCode === 403) {
+    return false;
+  }
+
+  return (
+    statusCode === 404 ||
+    statusCode === 429 ||
+    (typeof statusCode === "number" && statusCode >= 500) ||
+    message.includes("No endpoints found") ||
+    message.includes("temporarily unavailable")
+  );
 }
 
 function parsePossiblyWrappedJson(text: string) {
@@ -81,15 +121,41 @@ export async function POST(req: NextRequest) {
     const input: TokenomicsInput = validatedInput.data;
 
     const userPrompt = buildUserPrompt(input);
-    const modelId = process.env.OPENROUTER_MODEL || "anthropic/claude-3.5-sonnet";
+    const candidateModels = getCandidateModels(process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat-v3.1");
 
-    const result = await generateText({
-      model: openrouter(modelId),
-      system: TOKENOMICS_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: userPrompt }],
-      temperature: 0.2,
-      maxTokens: 9000,
-    });
+    let result: Awaited<ReturnType<typeof generateText>> | null = null;
+    let lastError: unknown = null;
+
+    for (const modelId of candidateModels) {
+      try {
+        result = await generateText({
+          model: openrouter(modelId),
+          system: TOKENOMICS_SYSTEM_PROMPT,
+          messages: [{ role: "user", content: userPrompt }],
+          temperature: 0.2,
+          maxTokens: 9000,
+        });
+        break;
+      } catch (error) {
+        lastError = error;
+        const statusCode = getStatusCode(error);
+        console.warn(`[Mintomics] Model attempt failed for ${modelId}${statusCode ? ` (status ${statusCode})` : ""}:`, error);
+
+        if (!shouldTryNextModel(error) || modelId === candidateModels[candidateModels.length - 1]) {
+          break;
+        }
+      }
+    }
+
+    if (!result) {
+      console.warn("[Mintomics] Falling back to deterministic output after all model attempts failed:", lastError);
+      const normalizedOutput = normalizeTokenomicsOutput(input, null);
+
+      return new Response(JSON.stringify(normalizedOutput), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     let normalizedOutput: unknown;
 
@@ -114,10 +180,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("[Mintomics] API error:", error);
 
-    const statusCode =
-      typeof error === "object" && error !== null && "statusCode" in error
-        ? Number((error as { statusCode: unknown }).statusCode)
-        : undefined;
+    const statusCode = getStatusCode(error);
 
     if (statusCode === 401 || statusCode === 403) {
       return new Response(
