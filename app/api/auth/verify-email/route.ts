@@ -7,6 +7,7 @@ import { findUserById, setUserEmailVerified } from "@/lib/auth/store";
 import { issueSessionForUser } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {

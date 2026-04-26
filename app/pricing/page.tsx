@@ -25,22 +25,22 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
   return (
     <main className="min-h-screen bg-black text-gray-100">
       <TrackPageView eventName="pricing_viewed" payload={{ surface: "pricing_page" }} />
-      <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
+      <header className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <Link href="/" className="text-sm font-semibold uppercase tracking-[0.28em] text-white/70">
           Mintomics
         </Link>
         <AuthControls mode="landing" />
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">
             Pricing
           </p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white md:text-6xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl md:text-6xl">
             Choose the workflow that matches where your token model is going.
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-gray-400">
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-gray-400 sm:text-base sm:leading-8">
             Free is enough to validate the shape. Pro is for investor-ready sharing and repeatable export. Agency is for teams and consultants who need custom onboarding.
           </p>
           <p className="mt-4 text-sm text-gray-500">

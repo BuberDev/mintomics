@@ -18,6 +18,14 @@ interface AuthControlsProps {
   mode?: "landing" | "app" | "mobile";
 }
 
+function getDefaultRedirectTarget(pathname: string) {
+  if (pathname.startsWith("/account")) {
+    return "/account";
+  }
+
+  return "/generate";
+}
+
 export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
   const pathname = usePathname();
   const [user, setUser] = useState<AuthUser | null | undefined>(undefined);
@@ -50,22 +58,23 @@ export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
   }, []);
 
   const linkClassName = cn(
-    "text-sm font-medium transition-colors",
+    "min-h-10 whitespace-nowrap text-sm font-medium transition-colors",
     mode === "landing"
       ? "text-gray-300 hover:text-white"
       : mode === "app"
-        ? "rounded-lg border border-white/15 px-3 py-2 text-gray-300 hover:border-white/35 hover:text-white"
-        : "rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5",
+        ? "inline-flex items-center justify-center rounded-lg border border-white/15 px-3 py-2 text-center text-gray-300 hover:border-white/35 hover:text-white"
+        : "rounded-xl border border-white/10 px-4 py-3 text-center text-white hover:bg-white/5",
   );
 
   const primaryButtonClassName = cn(
-    "rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-all hover:bg-gray-100 hover:scale-105 active:scale-95 text-center",
+    "min-h-11 rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-all hover:bg-gray-100 hover:scale-105 active:scale-95 text-center",
     mode === "mobile" && "w-full py-3 text-base",
   );
 
   const secondaryButtonClassName = cn(
-    "rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5",
-    mode === "mobile" && "w-full",
+    "min-h-10 rounded-xl border border-white/10 px-4 py-2.5 text-center text-white hover:bg-white/5",
+    mode === "mobile" && "w-full min-h-11 py-3",
+    mode === "app" && "text-sm font-medium text-gray-200 hover:border-white/25 hover:bg-white/5",
   );
 
   const handleSignOut = async () => {
@@ -89,9 +98,9 @@ export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
 
   if (!user) {
     return (
-      <div className={cn("flex items-center gap-4", mode === "mobile" && "flex-col w-full items-stretch")}>
+      <div className={cn("flex w-full flex-col gap-3", mode === "mobile" ? "items-stretch" : "sm:w-auto sm:flex-row sm:flex-wrap sm:items-center")}>
         <Link
-          href={pathname.startsWith("/sign-in") ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(pathname)}`}
+          href={pathname.startsWith("/sign-in") ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(getDefaultRedirectTarget(pathname))}`}
           onClick={() => {
             void trackEvent("cta_clicked", { surface: "landing", label: "sign_in" });
           }}
@@ -100,7 +109,7 @@ export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
           Sign In
         </Link>
         <Link
-          href={pathname.startsWith("/sign-up") ? "/sign-up" : `/sign-up?redirect_url=${encodeURIComponent(pathname)}`}
+          href={pathname.startsWith("/sign-up") ? "/sign-up" : `/sign-up?redirect_url=${encodeURIComponent(getDefaultRedirectTarget(pathname))}`}
           onClick={() => {
             void trackEvent("cta_clicked", { surface: "landing", label: "start_free" });
           }}
@@ -113,21 +122,32 @@ export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
   }
 
   return (
-    <div className={cn("flex items-center gap-4", mode === "mobile" && "flex-col w-full items-stretch")}>
+    <div
+      className={cn(
+        mode === "mobile"
+          ? "flex w-full flex-col gap-3 items-stretch"
+          : mode === "app"
+            ? "inline-flex w-auto flex-row flex-wrap items-center justify-end gap-1.5 sm:gap-2"
+            : "flex w-full flex-col gap-3",
+        mode === "mobile"
+          ? ""
+          : "",
+      )}
+    >
       {pathname !== "/generate" && (
         <Link
           href="/generate"
           onClick={() => {
             void trackEvent("cta_clicked", { surface: "app", label: "dashboard" });
           }}
-          className={linkClassName}
+          className={cn(linkClassName, mode === "app" && "px-3 py-2 text-[11px] sm:text-xs")}
         >
           Dashboard
         </Link>
       )}
 
       {pathname !== "/account" && (
-        <Link href="/account" className={linkClassName}>
+        <Link href="/account" className={cn(linkClassName, mode === "app" && "px-3 py-2 text-[11px] sm:text-xs")}>
           Account
         </Link>
       )}
@@ -135,7 +155,7 @@ export default function AuthControls({ mode = "landing" }: AuthControlsProps) {
       <button
         type="button"
         onClick={() => void handleSignOut()}
-        className={secondaryButtonClassName}
+        className={cn(secondaryButtonClassName, mode === "app" && "w-auto px-3 py-2 text-[11px] sm:text-xs")}
       >
         Sign Out
       </button>

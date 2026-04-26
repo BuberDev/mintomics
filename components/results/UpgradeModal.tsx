@@ -7,7 +7,6 @@ interface UpgradeModalProps {
   isOpen: boolean;
   reason: UpgradeReason;
   onClose: () => void;
-  onUnlockPreview: () => void;
 }
 
 const COPY: Record<UpgradeReason, { title: string; description: string }> = {
@@ -28,7 +27,6 @@ export default function UpgradeModal({
   isOpen,
   reason,
   onClose,
-  onUnlockPreview,
 }: UpgradeModalProps) {
   if (!isOpen) {
     return null;
@@ -84,10 +82,10 @@ export default function UpgradeModal({
             View Pricing
           </a>
           <button
-            onClick={onUnlockPreview}
+            onClick={onClose}
             className="flex-1 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100"
           >
-            Unlock Pro
+            Close
           </button>
         </div>
       </div>

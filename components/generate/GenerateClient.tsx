@@ -14,7 +14,6 @@ import {
   deleteProjectRecord,
   listSavedProjects,
   saveProjectRecord,
-  updateProjectPlan,
 } from "@/lib/mintomics/projectStorage";
 import type {
   PlanTier,
@@ -96,6 +95,12 @@ export default function GenerateClient() {
         if (payload.plan === "pro" || payload.billingPlan === "pro") {
           setBillingPlan("pro");
           setPlan("pro");
+          void trackEvent("upgrade_completed", {
+            projectId: activeProjectId,
+            plan: "pro",
+            cycle: payload.cycle ?? "monthly",
+            surface: "billing_complete",
+          });
         }
       })
       .catch((err) => {
@@ -237,50 +242,53 @@ export default function GenerateClient() {
         <SignupCompletionTracker plan={effectivePlan} />
       </Suspense>
 
-      <header className="border-b border-white/10 px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/" className="inline-flex items-center gap-2.5 transition-transform hover:scale-105">
+      <header className="sticky top-0 z-20 border-b border-white/10 bg-black/85 px-4 py-4 backdrop-blur-xl sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <Link href="/" className="inline-flex min-w-0 items-center gap-2.5 transition-transform hover:scale-105">
             <BrandLogo
               variant="wordmark"
               width={220}
               height={56}
               priority
-              className="h-9 w-auto"
+              className="h-8 w-auto sm:h-9"
             />
           </Link>
-          <div className="flex items-center gap-3 text-sm text-gray-400">
-            <span
-              className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${effectivePlan === "pro"
-                ? "border border-white/25 bg-white/10 text-white"
-                : "border border-white/15 bg-white/5 text-gray-300"
-                }`}
-            >
-              {billingSyncState === "verifying"
-                ? "Confirming purchase..."
-                : effectivePlan === "pro"
-                  ? "Pro"
-                  : "Free Plan"}
-            </span>
-            {status === "streaming" && (
-              <span className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-                Generating your mintomics model...
+          <div className="flex min-w-0 flex-1 flex-row flex-wrap items-center justify-end gap-x-2 gap-y-2 sm:gap-x-3">
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <span
+                className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-full border px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.24em] leading-none ${effectivePlan === "pro"
+                  ? "border-white/20 bg-white/10 text-white"
+                  : "border-white/10 bg-white/5 text-gray-300"
+                  }`}
+              >
+                {billingSyncState === "verifying"
+                  ? "Confirming purchase..."
+                  : effectivePlan === "pro"
+                    ? "Pro"
+                    : "Free Plan"}
               </span>
-            )}
-            {status === "complete" && (
-              <span className="text-green-400">✓ Generation complete</span>
-            )}
-            {billingSyncState === "verifying" && (
-              <span className="text-gray-300">Verifying Stripe payment...</span>
-            )}
+              {status === "streaming" && (
+                <span className="hidden items-center gap-2 text-xs text-gray-300 sm:flex sm:text-sm">
+                  <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                  Generating your mintomics model...
+                </span>
+              )}
+              {status === "complete" && (
+                <span className="hidden text-xs text-green-400 sm:block sm:text-sm">✓ Generation complete</span>
+              )}
+              {billingSyncState === "verifying" && (
+                <span className="hidden text-xs text-gray-300 sm:block sm:text-sm">Verifying Stripe payment...</span>
+              )}
+            </div>
             <AuthControls mode="app" />
           </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
-        <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)]">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+        <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
           <ProjectHistorySidebar
+            className="order-2 xl:order-1"
             activeProjectId={activeProjectId}
             onCreateNew={startNewProject}
             onDeleteProject={handleDeleteProject}
@@ -288,14 +296,14 @@ export default function GenerateClient() {
             projects={savedProjects}
           />
 
-          <div>
+          <div className="order-1 min-w-0 xl:order-2">
             {(status === "idle" || status === "error") && (
               <>
-                <div className="mb-10 text-center">
-                  <h1 className="mb-2 text-3xl font-bold text-white">
+                <div className="mb-8 text-center sm:mb-10">
+                  <h1 className="mb-2 text-2xl font-bold text-white sm:text-3xl">
                     Design your mintomics
                   </h1>
-                  <p className="text-gray-400">
+                  <p className="mx-auto max-w-xl text-sm leading-7 text-gray-400 sm:text-base">
                     Fill in your project details and get a complete model in about 60 seconds.
                   </p>
                 </div>
@@ -306,7 +314,7 @@ export default function GenerateClient() {
                       <p>{error}</p>
                       <button
                         onClick={retryLastGeneration}
-                        className="rounded-lg border border-red-400/30 px-4 py-2 text-sm font-medium text-red-200 transition-colors hover:border-red-300 hover:text-white"
+                        className="min-h-11 rounded-lg border border-red-400/30 px-4 py-3 text-sm font-medium text-red-200 transition-colors hover:border-red-300 hover:text-white"
                       >
                         Retry last generation
                       </button>
@@ -329,13 +337,13 @@ export default function GenerateClient() {
             )}
 
             {isGenerating && (
-              <div className="flex flex-col items-center justify-center gap-6 py-32">
-                <div className="h-16 w-16 animate-spin rounded-full border-4 border-white/20 border-t-white" />
+              <div className="flex flex-col items-center justify-center gap-5 py-20 sm:py-32">
+                <div className="h-14 w-14 animate-spin rounded-full border-4 border-white/20 border-t-white sm:h-16 sm:w-16" />
                 <div className="text-center">
-                  <h2 className="mb-2 text-xl font-semibold text-white">
+                  <h2 className="mb-2 text-lg font-semibold text-white sm:text-xl">
                     Analyzing your project...
                   </h2>
-                  <p className="max-w-md text-sm text-gray-400">
+                  <p className="mx-auto max-w-md text-sm leading-7 text-gray-400">
                     Mintomics is designing your allocation model, vesting schedules,
                     emission curve, and running red flag analysis.
                   </p>
@@ -353,26 +361,6 @@ export default function GenerateClient() {
                 }}
                 plan={effectivePlan}
                 result={result}
-                onUpgradePreview={() => {
-                  setPlan("pro");
-                  void trackEvent("upgrade_completed", {
-                    projectId: activeProjectId,
-                    plan: "pro",
-                  });
-                  if (activeProjectId) {
-                    void updateProjectPlan(activeProjectId, "pro")
-                      .then(() => {
-                        void syncSavedProjects();
-                      })
-                      .catch((err) => {
-                        const message =
-                          err instanceof Error
-                            ? err.message
-                            : "Failed to update project plan.";
-                        setError(message);
-                      });
-                  }
-                }}
                 onReset={startNewProject}
               />
             )}

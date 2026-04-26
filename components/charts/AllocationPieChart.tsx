@@ -28,9 +28,9 @@ export default function AllocationPieChart({ allocation }: AllocationPieChartPro
   const totalPercent = allocation.reduce((sum, item) => sum + item.percent, 0);
 
   return (
-    <section className="glass rounded-xl p-6">
-      <div className="mb-4 flex items-baseline justify-between gap-4">
-        <h3 className="text-white/75 font-semibold text-sm uppercase tracking-wider">
+    <section className="glass rounded-xl p-4 sm:p-6">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+        <h3 className="text-white/75 text-sm font-semibold uppercase tracking-wider">
           Allocation Breakdown
         </h3>
         <span className="text-xs text-gray-400">
@@ -38,7 +38,7 @@ export default function AllocationPieChart({ allocation }: AllocationPieChartPro
         </span>
       </div>
 
-      <div className="h-80 w-full">
+      <div className="h-64 w-full sm:h-80">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -47,8 +47,8 @@ export default function AllocationPieChart({ allocation }: AllocationPieChartPro
               nameKey="category"
               cx="50%"
               cy="50%"
-              innerRadius={72}
-              outerRadius={116}
+              innerRadius={52}
+              outerRadius={92}
               paddingAngle={2}
               stroke="rgba(10, 12, 26, 0.9)"
               strokeWidth={2}
@@ -70,17 +70,13 @@ export default function AllocationPieChart({ allocation }: AllocationPieChartPro
               }}
             />
 
-            <Legend
-              verticalAlign="bottom"
-              iconType="circle"
-              formatter={(value) => <span className="text-gray-300 text-xs">{value}</span>}
-            />
+            <Legend verticalAlign="bottom" iconType="circle" formatter={(value) => <span className="text-xs text-gray-300">{value}</span>} />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
       <div className="mt-4 overflow-x-auto">
-        <table className="w-full min-w-[540px] text-sm">
+        <table className="min-w-full text-sm sm:min-w-[540px]">
           <thead>
             <tr className="text-left text-xs uppercase tracking-wider text-gray-500 border-b border-white/10">
               <th className="py-2">Category</th>

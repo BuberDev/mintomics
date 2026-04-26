@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ArrowRight, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import Image from "next/image";
 
 type Props = {};
 
@@ -54,16 +55,16 @@ export default function ForgotPasswordPage(_: Props) {
   };
 
   return (
-    <main className="min-h-screen bg-black px-6 py-16 text-gray-100">
+    <main className="min-h-screen bg-black px-4 py-12 text-gray-100 sm:px-6 sm:py-16">
       <div className="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-        <section className="glass-effect rounded-[2rem] p-8">
+        <section className="glass-effect rounded-[2rem] p-6 sm:p-8">
           <p className="text-[11px] uppercase tracking-[0.28em] text-white/60">
             Account recovery
           </p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white">
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Recover access to your Mintomics account.
           </h1>
-          <p className="mt-5 text-sm leading-7 text-gray-400">
+          <p className="mt-5 text-sm leading-7 text-gray-400 sm:text-base">
             Request a secure reset link and set a new password without exposing your account to unnecessary risk.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -85,11 +86,11 @@ export default function ForgotPasswordPage(_: Props) {
         <section className="mx-auto w-full max-w-md">
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-xl">
             <div className="flex items-center justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                <Sparkles className="h-7 w-7 text-white" />
+              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/5 p-2.5">
+                <Image src="/logo.png" alt="Mintomics" width={64} height={64} className="h-full w-full object-contain" />
               </div>
             </div>
-            <h2 className="mt-6 text-center text-3xl font-semibold text-white">
+            <h2 className="mt-6 text-center text-2xl font-semibold text-white sm:text-3xl">
               Reset your password
             </h2>
             <p className="mt-3 text-center text-sm leading-7 text-gray-400">
@@ -124,11 +125,11 @@ export default function ForgotPasswordPage(_: Props) {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#5b5bf7] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4b4be9] disabled:cursor-not-allowed disabled:opacity-70"
-              >
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#5b5bf7] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4b4be9] disabled:cursor-not-allowed disabled:opacity-70"
+                >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
                 Send reset link
               </button>

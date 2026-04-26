@@ -58,30 +58,30 @@ export default function FooterNewsletter() {
         <div className="absolute bottom-[10%] right-[8%] h-96 w-96 rounded-full bg-slate-300/10 blur-3xl" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="glass-effect mb-10 overflow-hidden rounded-[2rem] border border-white/10 p-8 shadow-[0_22px_70px_rgba(0,0,0,0.45)] md:p-12">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="glass-effect mb-10 overflow-hidden rounded-[2rem] border border-white/10 p-6 shadow-[0_22px_70px_rgba(0,0,0,0.45)] md:p-12">
+          <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">
                 Private Beta Signal
               </p>
-              <h3 className="mt-4 max-w-xl text-3xl font-semibold tracking-tight text-white md:text-5xl">
+              <h3 className="mt-4 max-w-xl text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-5xl">
                 Build a token narrative investors can interrogate, not just admire.
               </h3>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-gray-400">
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-gray-400 sm:text-base sm:leading-8">
                 Get product updates, launch notes, and examples of strong allocation design straight from the Mintomics beta workflow.
               </p>
 
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
                 <input
                   type="email"
                   placeholder="Enter your work email"
                   aria-label="Work email"
-                  className="input-field h-12 rounded-xl border-white/15 bg-black/45 px-4 focus:border-white/40 focus:ring-white/20 sm:min-w-0 sm:flex-1"
+                  className="input-field h-11 rounded-xl border-white/15 bg-black/45 px-4 focus:border-white/40 focus:ring-white/20 sm:min-w-0 sm:flex-1 sm:h-12"
                 />
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black transition hover:bg-gray-100 sm:w-auto"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black transition hover:bg-gray-100 sm:w-auto"
                 >
                   Join the Beta List
                   <ChevronRight className="h-4 w-4" />
@@ -105,8 +105,8 @@ export default function FooterNewsletter() {
           </div>
         </div>
 
-        <div className="mb-8 grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
-          <div className="col-span-2 lg:col-span-2">
+        <div className="mb-8 grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
+          <div className="sm:col-span-2 lg:col-span-2">
             <div className="mb-6 flex items-center space-x-3">
               <BrandLogo
                 variant="wordmark"
@@ -119,7 +119,7 @@ export default function FooterNewsletter() {
             <p className="max-w-md text-sm leading-7 text-gray-400">
               Built for Web3 founders who need sharp token logic, cleaner unlock narratives, and investor-ready reporting without waiting on a consulting sprint.
             </p>
-            <div className="mt-6 flex flex-wrap gap-4">
+            <div className="mt-6 flex flex-wrap gap-3">
               {socialIcons.map((item, i) => (
                 <Link
                   key={i}

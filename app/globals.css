@@ -4,6 +4,7 @@
 
 @layer base {
   html { @apply bg-black text-gray-100; }
+  html, body { @apply overflow-x-hidden; }
   body { @apply min-h-screen antialiased; background-color: #000000; }
 }
 
@@ -63,4 +64,3 @@ div:has(> a[href*="clerk."]),
   visibility: hidden !important;
   pointer-events: none !important;
 }
-

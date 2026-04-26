@@ -40,14 +40,14 @@ export default function EmissionCurveChart({ emissionCurve }: EmissionCurveChart
   );
 
   return (
-    <section className="glass rounded-xl p-6">
-      <h3 className="text-white/75 font-semibold text-sm uppercase tracking-wider mb-4">
+    <section className="glass rounded-xl p-4 sm:p-6">
+      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/75">
         Emission Curve
       </h3>
 
-      <div className="h-80 w-full">
+      <div className="h-64 w-full sm:h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={sortedCurve} margin={{ top: 8, right: 16, left: 0, bottom: 10 }}>
+          <ComposedChart data={sortedCurve} margin={{ top: 8, right: 8, left: 0, bottom: 10 }}>
             <defs>
               <linearGradient id="circulatingFill" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#ffffff" stopOpacity={0.35} />
@@ -59,21 +59,21 @@ export default function EmissionCurveChart({ emissionCurve }: EmissionCurveChart
             <XAxis
               dataKey="month"
               tickFormatter={(month) => `M${month}`}
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: "#94a3b8", fontSize: 11 }}
               stroke="rgba(148, 163, 184, 0.35)"
             />
             <YAxis
               yAxisId="percent"
               domain={[0, 100]}
               tickFormatter={(value) => `${value}%`}
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: "#94a3b8", fontSize: 11 }}
               stroke="rgba(148, 163, 184, 0.35)"
             />
             <YAxis
               yAxisId="tokens"
               orientation="right"
               tickFormatter={(value) => tokenFormatter.format(value)}
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: "#94a3b8", fontSize: 11 }}
               stroke="rgba(148, 163, 184, 0.35)"
             />
             <Tooltip
@@ -85,11 +85,7 @@ export default function EmissionCurveChart({ emissionCurve }: EmissionCurveChart
                 color: "#f3f4f6",
               }}
             />
-            <Legend
-              verticalAlign="bottom"
-              iconType="circle"
-              formatter={(value) => <span className="text-gray-300 text-xs">{value}</span>}
-            />
+            <Legend verticalAlign="bottom" iconType="circle" formatter={(value) => <span className="text-xs text-gray-300">{value}</span>} />
 
             <Area
               yAxisId="percent"

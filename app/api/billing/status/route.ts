@@ -2,6 +2,7 @@ import { getBillingState, isPostgresConfigured } from "@/lib/db/billing";
 import { getCurrentUserId } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function serviceUnavailable() {
   return new Response(

@@ -38,9 +38,28 @@ export default function TokenomicsForm({
   const [values, setValues] = useState<TokenomicsInput>(
     initialValues ?? createDefaultTokenomicsInput(),
   );
+  const [numericDrafts, setNumericDrafts] = useState<Partial<Record<keyof TokenomicsInput, string>>>({});
 
   useEffect(() => {
-    setValues(initialValues ?? createDefaultTokenomicsInput());
+    const nextValues = initialValues ?? createDefaultTokenomicsInput();
+
+    setValues(nextValues);
+    setNumericDrafts({
+      totalSupply: String(nextValues.totalSupply),
+      targetRaiseUsd: String(nextValues.targetRaiseUsd),
+      tokenPriceUsd: String(nextValues.tokenPriceUsd),
+      launchTimelineMonths: String(nextValues.launchTimelineMonths),
+      teamPercent: String(nextValues.teamPercent),
+      investorsPercent: String(nextValues.investorsPercent),
+      communityPercent: String(nextValues.communityPercent),
+      treasuryPercent: String(nextValues.treasuryPercent),
+      ecosystemPercent: String(nextValues.ecosystemPercent),
+      publicSalePercent: String(nextValues.publicSalePercent),
+      teamCliffMonths: String(nextValues.teamCliffMonths),
+      teamVestingMonths: String(nextValues.teamVestingMonths),
+      investorCliffMonths: String(nextValues.investorCliffMonths),
+      investorVestingMonths: String(nextValues.investorVestingMonths),
+    });
     setStep(0);
   }, [initialValues, resetKey]);
 
@@ -90,6 +109,23 @@ export default function TokenomicsForm({
   const set = (key: keyof TokenomicsInput, value: string | number) =>
     setValues((v) => ({ ...v, [key]: value }));
 
+  const setNumericValue = (key: keyof TokenomicsInput, rawValue: string) => {
+    setNumericDrafts((drafts) => ({ ...drafts, [key]: rawValue }));
+
+    if (rawValue === "") {
+      return;
+    }
+
+    const nextValue = Number(rawValue);
+
+    if (!Number.isNaN(nextValue)) {
+      set(key, nextValue);
+    }
+  };
+
+  const getNumericValue = (key: keyof TokenomicsInput) =>
+    numericDrafts[key] ?? String(values[key] as number);
+
   const isStep0Valid =
     values.projectName.trim().length > 1 &&
     values.tokenSymbol.trim().length > 1 &&
@@ -107,13 +143,13 @@ export default function TokenomicsForm({
     values.mainUseCase.trim().length > 5;
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="mx-auto w-full max-w-2xl">
       {/* Step indicator */}
-      <div className="flex items-center gap-2 mb-8">
+      <div className="mb-6 flex items-center gap-1.5 sm:mb-8 sm:gap-2">
         {STEPS.map((label, i) => (
           <div key={i} className="flex items-center gap-2 flex-1">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${i < step ? "bg-white text-black" :
+              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${i < step ? "bg-white text-black" :
                   i === step ? "border-2 border-white text-white" :
                     "border border-white/20 text-gray-500"
                 }`}
@@ -193,12 +229,12 @@ export default function TokenomicsForm({
       {/* Step 1 — Token Supply & Funding */}
       {step === 1 && (
         <div className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Total Supply" required tooltip="Maximum number of tokens that will ever exist">
               <input
                 type="number"
-                value={values.totalSupply}
-                onChange={(e) => set("totalSupply", Number(e.target.value))}
+                value={getNumericValue("totalSupply")}
+                onChange={(e) => setNumericValue("totalSupply", e.target.value)}
                 className="input-field"
               />
             </Field>
@@ -220,21 +256,21 @@ export default function TokenomicsForm({
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Target Raise (USD)" required tooltip="How much do you plan to raise in total?">
               <input
                 type="number"
-                value={values.targetRaiseUsd}
-                onChange={(e) => set("targetRaiseUsd", Number(e.target.value))}
+                value={getNumericValue("targetRaiseUsd")}
+                onChange={(e) => setNumericValue("targetRaiseUsd", e.target.value)}
                 className="input-field"
               />
             </Field>
             <Field label="Seed Token Price (USD)" required tooltip="Price per token in the seed round">
               <input
                 type="number"
-                value={values.tokenPriceUsd}
+                value={getNumericValue("tokenPriceUsd")}
                 step="0.001"
-                onChange={(e) => set("tokenPriceUsd", Number(e.target.value))}
+                onChange={(e) => setNumericValue("tokenPriceUsd", e.target.value)}
                 className="input-field"
               />
             </Field>
@@ -246,10 +282,10 @@ export default function TokenomicsForm({
           >
             <input
               type="number"
-              value={values.launchTimelineMonths}
+              value={getNumericValue("launchTimelineMonths")}
               min={1}
               max={36}
-              onChange={(e) => set("launchTimelineMonths", Number(e.target.value))}
+              onChange={(e) => setNumericValue("launchTimelineMonths", e.target.value)}
               className="input-field"
             />
           </Field>
@@ -300,7 +336,7 @@ export default function TokenomicsForm({
 
           <div>
             <h3 className="text-white font-medium mb-3">Allocation Preferences (%)</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {[
                 ["teamPercent", "Team"],
                 ["investorsPercent", "Investors"],
@@ -317,10 +353,10 @@ export default function TokenomicsForm({
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
-                      value={values[key as keyof TokenomicsInput] as number}
+                      value={getNumericValue(key as keyof TokenomicsInput)}
                       min={0}
                       max={100}
-                      onChange={(e) => set(key as keyof TokenomicsInput, Number(e.target.value))}
+                      onChange={(e) => setNumericValue(key as keyof TokenomicsInput, e.target.value)}
                       className="input-field"
                     />
                     <span className="text-gray-400 text-sm flex-shrink-0">%</span>
@@ -333,15 +369,15 @@ export default function TokenomicsForm({
           <div>
             <h3 className="text-white font-medium mb-3">Vesting Preferences</h3>
             {/* These defaults let founders express lock-up preferences in plain language. */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {vestingFields.map(({ key, label, tooltip }) => (
                 <Field key={key} label={label} tooltip={tooltip}>
                   <input
                     type="number"
-                    value={values[key as keyof TokenomicsInput] as number}
+                    value={getNumericValue(key as keyof TokenomicsInput)}
                     min={0}
                     max={60}
-                    onChange={(e) => set(key as keyof TokenomicsInput, Number(e.target.value))}
+                    onChange={(e) => setNumericValue(key as keyof TokenomicsInput, e.target.value)}
                     className="input-field"
                   />
                 </Field>
@@ -352,11 +388,11 @@ export default function TokenomicsForm({
       )}
 
       {/* Navigation */}
-      <div className="flex gap-3 mt-8">
+      <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row">
         {step > 0 && (
           <button
             onClick={() => setStep(step - 1)}
-            className="flex-1 border border-white/20 hover:border-white/40 text-gray-300 py-3 rounded-xl transition-colors"
+            className="min-h-11 flex-1 rounded-xl border border-white/20 py-3 text-gray-300 transition-colors hover:border-white/40"
           >
             ← Back
           </button>
@@ -369,7 +405,7 @@ export default function TokenomicsForm({
               setStep(step + 1);
             }}
             disabled={step === 0 ? !isStep0Valid : !isStep1Valid}
-            className="flex-1 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed text-black py-3 rounded-xl font-semibold transition-colors"
+            className="min-h-11 flex-1 rounded-xl bg-white py-3 font-semibold text-black transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Next: {STEPS[step + 1]} →
           </button>
@@ -377,7 +413,7 @@ export default function TokenomicsForm({
           <button
             onClick={() => onSubmit(values)}
             disabled={!canSubmit || isLoading}
-            className="flex-1 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed text-black py-3 rounded-xl font-semibold transition-colors"
+            className="min-h-11 flex-1 rounded-xl bg-white py-3 font-semibold text-black transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isLoading ? "Generating..." : "Generate Tokenomics ✦"}
           </button>
@@ -401,7 +437,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-300 mb-1.5">
+      <label className="mb-1.5 block text-sm font-medium text-gray-300">
         {label}
         {required && <span className="text-white ml-0.5">*</span>}
         {tooltip && (

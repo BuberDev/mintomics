@@ -210,16 +210,16 @@ export default function AuthFlowPage({ mode }: Props) {
   };
 
   return (
-    <main className="min-h-screen bg-black px-6 py-16 text-gray-100">
+    <main className="min-h-screen bg-black px-4 py-12 text-gray-100 sm:px-6 sm:py-16">
       <div className="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-        <section className="glass-effect rounded-[2rem] p-8">
+        <section className="glass-effect rounded-[2rem] p-6 sm:p-8">
           <p className="text-[11px] uppercase tracking-[0.28em] text-white/60">
             {pageMeta.eyebrow}
           </p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white">
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             {pageMeta.title}
           </h1>
-          <p className="mt-5 text-sm leading-7 text-gray-400">
+          <p className="mt-5 text-sm leading-7 text-gray-400 sm:text-base">
             {pageMeta.subtitle}
           </p>
 
@@ -232,16 +232,16 @@ export default function AuthFlowPage({ mode }: Props) {
             </div>
           )}
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
               href={pageMeta.switchHref}
-              className="inline-flex rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
             >
               {pageMeta.switchLabel} {mode === "sign-in" ? "Create one" : "Sign in"}
             </Link>
             <Link
               href="/"
-              className="inline-flex rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-gray-200 transition-colors hover:border-white/25 hover:bg-white/5"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-gray-200 transition-colors hover:border-white/25 hover:bg-white/5"
             >
               Back to home
             </Link>
@@ -264,9 +264,9 @@ export default function AuthFlowPage({ mode }: Props) {
         </section>
 
         <section className="mx-auto w-full max-w-md">
-          <div className="rounded-[2rem] p-8 shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+          <div className="rounded-[2rem] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:p-8">
             <div className="flex items-center justify-center">
-              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full  p-2.5">
+              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/5 p-2.5">
                 <Image
                   src="/logo.png"
                   alt="Mintomics"
@@ -277,7 +277,7 @@ export default function AuthFlowPage({ mode }: Props) {
                 />
               </div>
             </div>
-            <h2 className="mt-6 text-center text-3xl font-semibold text-white">
+            <h2 className="mt-6 text-center text-2xl font-semibold text-white sm:text-3xl">
               {mode === "sign-in" ? "Sign in to Mintomics" : "Create your account"}
             </h2>
             <p className="mt-3 text-center text-sm leading-7 text-gray-400">
@@ -294,7 +294,7 @@ export default function AuthFlowPage({ mode }: Props) {
 
             <a
               href={googleHref}
-              className="mt-8 flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white transition-colors hover:border-white/25 hover:bg-white/10"
+              className="mt-8 flex min-h-11 items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white transition-colors hover:border-white/25 hover:bg-white/10"
             >
               <GoogleMark />
               {pageMeta.googleLabel}

@@ -35,10 +35,10 @@ export default function SiteHeader() {
           : "bg-transparent py-5"
       )}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-8" aria-label="Global">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5 transition-transform hover:scale-105">
-            <BrandLogo variant="wordmark" className="h-10 w-auto" />
+            <BrandLogo variant="wordmark" className="h-8 w-auto sm:h-10" />
           </Link>
         </div>
         
@@ -63,7 +63,7 @@ export default function SiteHeader() {
         <div className="flex lg:hidden">
           <button
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-400 hover:text-white"
+            className="-m-2.5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2.5 text-gray-400 hover:text-white"
             onClick={() => setMobileMenuOpen(true)}
           >
             <span className="sr-only">Open main menu</span>
@@ -83,7 +83,7 @@ export default function SiteHeader() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
         
         <div className={cn(
-          "fixed inset-y-0 right-0 z-50 w-full overflow-y-auto px-6 py-6 sm:max-w-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+          "fixed inset-y-0 right-0 z-50 w-full overflow-y-auto px-4 py-4 sm:max-w-sm sm:px-6 sm:py-6 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
           "bg-white/[0.03] backdrop-blur-3xl border-l border-white/10 shadow-[-20px_0_50px_rgba(0,0,0,0.3)]",
           mobileMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
         )}>
@@ -94,12 +94,12 @@ export default function SiteHeader() {
                 width={220}
                 height={56}
                 priority
-                className="h-9 w-auto"
+                className="h-8 w-auto sm:h-9"
               />
             </Link>
             <button
               type="button"
-              className="-m-2.5 rounded-md p-2.5 text-gray-400 hover:text-white"
+              className="-m-2.5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2.5 text-gray-400 hover:text-white"
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="sr-only">Close menu</span>
@@ -113,7 +113,7 @@ export default function SiteHeader() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white/90 hover:bg-white/10 hover:text-white transition-colors"
+                    className="-mx-3 block rounded-xl px-3 py-3 text-base font-semibold leading-7 text-white/90 hover:bg-white/10 hover:text-white transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.name}

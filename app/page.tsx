@@ -10,6 +10,7 @@ import SiteHeader from "@/components/ui/site-header";
 import TrackPageView from "@/components/analytics/TrackPageView";
 import PricingTiers from "@/components/pricing/PricingTiers";
 import { getCurrentAuth } from "@/lib/auth/session";
+import { redirect } from "next/navigation";
 
 const featureCards = [
   {
@@ -71,26 +72,30 @@ const testimonials = [
 export default async function LandingPage() {
   const isSignedIn = Boolean(await getCurrentAuth());
 
+  if (isSignedIn) {
+    redirect("/generate");
+  }
+
   return (
-    <main className="min-h-screen overflow-hidden bg-black text-gray-100">
+    <main className="min-h-screen overflow-x-clip bg-black text-gray-100">
       <SiteHeader />
       <TrackPageView eventName="landing_viewed" payload={{ surface: "home" }} />
       <EtherealBeamsHero />
 
-      <section id="features" className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8">
+      <section id="features" className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-gradient-to-b from-white/5 to-transparent" />
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-          <div className="glass-effect rounded-[2rem] p-8">
+          <div className="glass-effect rounded-[2rem] p-6 sm:p-8">
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
               Why This Feels Different
             </p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+            <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl">
               Less spreadsheet theatre. More decision-ready token design.
             </h2>
-            <p className="mt-6 text-base leading-8 text-gray-400">
+            <p className="mt-6 text-sm leading-7 text-gray-400 sm:text-base sm:leading-8">
               Most tools either drown founders in simulation jargon or stop at toy calculators. Mintomics is built around the actual moments that matter: shaping a credible launch narrative, avoiding obvious cap table mistakes, and surviving investor scrutiny.
             </p>
-            <div className="mt-8 grid gap-4">
+            <div className="mt-8 grid gap-3 sm:gap-4">
               {[
                 "Structured founder input instead of expert-only controls",
                 "Benchmark-aware recommendations instead of blank canvases",
@@ -104,11 +109,11 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <div className="grid content-start gap-6 md:grid-cols-2 xl:grid-cols-3 lg:self-start">
+          <div className="grid content-start gap-4 md:grid-cols-2 xl:grid-cols-3 lg:self-start sm:gap-6">
             {featureCards.map(({ icon: Icon, title, desc }) => (
               <div
                 key={title}
-                className="glass-effect h-auto rounded-[2rem] p-6 shadow-[0_16px_45px_rgba(0,0,0,0.34)] transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.07] hover:shadow-[0_24px_60px_rgba(0,0,0,0.48)]"
+                className="glass-effect h-auto rounded-[2rem] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.34)] transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.07] hover:shadow-[0_24px_60px_rgba(0,0,0,0.48)] sm:p-6"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/15 bg-white/5 text-white/85">
                   <Icon className="h-6 w-6" />
@@ -121,12 +126,12 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section id="process" className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
+      <section id="process" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div className="mb-12 max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
             Workflow
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">
+          <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-5xl">
             From founder input to investor-grade output in one focused pass.
           </h2>
         </div>
@@ -147,16 +152,16 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section id="readiness" className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+      <section id="readiness" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="glass-effect rounded-[2rem] p-8">
+          <div className="glass-effect rounded-[2rem] p-6 sm:p-8">
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
               Readiness Layer
             </p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+            <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl">
               Founders do not need another pretty chart. They need fewer blind spots.
             </h2>
-            <p className="mt-6 text-base leading-8 text-gray-400">
+            <p className="mt-6 text-sm leading-7 text-gray-400 sm:text-base sm:leading-8">
               Mintomics scores models across allocation concentration, vesting hygiene, unlock risk, and investor narrative quality, then turns that into a clear direction for the next iteration.
             </p>
           </div>
@@ -179,12 +184,12 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section id="testimonials" className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+      <section id="testimonials" className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
             Early Feedback
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">
+          <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-5xl">
             Builders want clarity, not another token spreadsheet.
           </h2>
         </div>
@@ -193,7 +198,7 @@ export default async function LandingPage() {
           {testimonials.map(({ quote, name, role }) => (
             <figure
               key={name}
-              className="glass-effect rounded-[2rem] p-7 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20"
+              className="glass-effect rounded-[2rem] p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 sm:p-7"
             >
               <blockquote className="text-base leading-8 text-gray-300">
                 “{quote}”
@@ -207,15 +212,15 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section id="pricing" className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
+      <section id="pricing" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
             Pricing
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">
+          <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-5xl">
             Transparent pricing for teams that need speed, signal, and exportable output.
           </h2>
-          <p className="mt-5 text-base leading-8 text-gray-400">
+          <p className="mt-5 text-sm leading-7 text-gray-400 sm:text-base sm:leading-8">
             Start free to validate the shape. Move to Pro for investor-ready reports, or Agency when you need repeatable delivery for clients.
           </p>
         </div>

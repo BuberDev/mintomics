@@ -32,7 +32,7 @@ export default async function AccountPage() {
   const cycleLabel = billing?.cycle ?? "monthly";
 
   return (
-    <main className="min-h-screen bg-black px-6 py-16 text-gray-100">
+    <main className="min-h-screen bg-black px-4 py-12 text-gray-100 sm:px-6 sm:py-16">
       <section className="mx-auto max-w-7xl">
         <div className="max-w-3xl">
           <div className="mb-8">
@@ -60,18 +60,18 @@ export default async function AccountPage() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">
             Account
           </p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white md:text-6xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl md:text-6xl">
             Profile, billing, sessions, and history in one place.
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-gray-400">
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-gray-400 sm:text-base sm:leading-8">
             This is the operational surface for your Mintomics workspace. It shows your identity, billing status,
             active sessions, and the actions needed to manage the account cleanly.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="mt-10 grid gap-6 xl:grid-cols-[1.1fr_0.9fr] xl:items-start">
           <section className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5">
                 <div className="flex items-center gap-3">
                   <UserCircle2 className="h-5 w-5 text-white/80" />
@@ -123,16 +123,16 @@ export default async function AccountPage() {
                     Sessions are persisted as secure httpOnly cookies. You can review your active devices and sign out from here.
                   </p>
                 </div>
-                <div className="grid gap-3 text-sm text-gray-300">
+                <div className="grid gap-3 text-sm text-gray-300 sm:grid-cols-2 lg:grid-cols-1">
                   <Link
                     href={billingHref}
-                    className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100"
+                    className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100"
                   >
                     {billingLabel}
                   </Link>
                   <Link
                     href="/api/auth/google/link/start"
-                    className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
+                    className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
                   >
                     {oauthAccounts.some((account) => account.provider === "google")
                       ? "Google connected"
@@ -140,7 +140,7 @@ export default async function AccountPage() {
                   </Link>
                   <Link
                     href="/pricing"
-                    className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
+                    className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
                   >
                     Compare plans
                   </Link>
@@ -180,7 +180,7 @@ export default async function AccountPage() {
               </div>
 
               <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black/25">
-                <div className="grid gap-4 p-5 md:grid-cols-2">
+                <div className="grid gap-4 p-5 sm:grid-cols-2">
                   <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
                     <div className="flex items-center gap-3">
                       <CreditCard className="h-5 w-5 text-white/80" />
@@ -261,27 +261,27 @@ export default async function AccountPage() {
             </section>
           </section>
 
-          <aside className="space-y-6">
+          <aside className="space-y-6 xl:sticky xl:top-24">
             <section className="glass-effect rounded-[2rem] border border-white/10 p-6">
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/55">
                 Support
               </p>
-              <h2 className="mt-3 text-2xl font-semibold text-white">
+              <h2 className="mt-3 text-xl font-semibold text-white sm:text-2xl">
                 Need help with billing or a custom setup?
               </h2>
               <p className="mt-3 text-sm leading-7 text-gray-400">
                 Use the billing portal for payment methods, cancellations, and invoices.
               </p>
-              <div className="mt-5 flex flex-wrap gap-3">
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
                 >
                   Pricing
                 </Link>
                 <Link
                   href="mailto:hello@Mintomics.ai?subject=Mintomics%20support"
-                  className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-white/30 hover:bg-white/5"
                 >
                   Email support
                 </Link>

@@ -73,25 +73,25 @@ export default function VestingTimelineChart({ vestingSchedules }: VestingTimeli
   );
 
   return (
-    <section className="glass rounded-xl p-6">
-      <h3 className="text-white/75 font-semibold text-sm uppercase tracking-wider mb-4">
+    <section className="glass rounded-xl p-4 sm:p-6">
+      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/75">
         Vesting Timeline
       </h3>
 
-      <div className="h-80 w-full">
+      <div className="h-64 w-full sm:h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 12, right: 16, left: 0, bottom: 12 }}>
+          <LineChart data={chartData} margin={{ top: 12, right: 8, left: 0, bottom: 12 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.15)" />
             <XAxis
               dataKey="month"
               tickFormatter={(month) => `M${month}`}
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: "#94a3b8", fontSize: 11 }}
               stroke="rgba(148, 163, 184, 0.35)"
             />
             <YAxis
               domain={[0, 100]}
               tickFormatter={(value) => `${value}%`}
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: "#94a3b8", fontSize: 11 }}
               stroke="rgba(148, 163, 184, 0.35)"
             />
             <Tooltip
@@ -104,11 +104,7 @@ export default function VestingTimelineChart({ vestingSchedules }: VestingTimeli
                 color: "#f3f4f6",
               }}
             />
-            <Legend
-              verticalAlign="bottom"
-              iconType="circle"
-              formatter={(value) => <span className="text-gray-300 text-xs">{value}</span>}
-            />
+            <Legend verticalAlign="bottom" iconType="circle" formatter={(value) => <span className="text-xs text-gray-300">{value}</span>} />
 
             {categories.map((category, index) => (
               <Line

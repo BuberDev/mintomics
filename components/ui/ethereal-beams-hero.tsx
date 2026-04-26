@@ -407,7 +407,7 @@ interface ButtonLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> 
 
 const ButtonLink = ({ href, variant = "default", size = "sm", className = "", children, ...props }: ButtonLinkProps) => {
   const baseClasses =
-    "inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 disabled:pointer-events-none disabled:opacity-50";
+    "inline-flex min-h-11 items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 disabled:pointer-events-none disabled:opacity-50";
 
   const variants = {
     default: "bg-white text-black hover:bg-gray-100",
@@ -416,8 +416,8 @@ const ButtonLink = ({ href, variant = "default", size = "sm", className = "", ch
   };
 
   const sizes = {
-    sm: "h-9 px-4 py-2 text-sm",
-    lg: "px-8 py-6 text-lg",
+    sm: "h-11 px-4 py-3 text-sm",
+    lg: "h-12 px-6 text-base sm:h-14 sm:px-8 sm:text-lg",
   };
 
   return (
@@ -435,7 +435,7 @@ const ButtonLink = ({ href, variant = "default", size = "sm", className = "", ch
 export default function EtherealBeamsHero() {
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-black">
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 hidden sm:block">
         <Beams
           beamWidth={2.5}
           beamHeight={18}
@@ -448,15 +448,18 @@ export default function EtherealBeamsHero() {
         />
       </div>
 
-      <div className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center pt-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.14),transparent_42%),radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_55%)] sm:hidden" />
+      <div className="absolute inset-x-0 top-0 z-0 h-64 bg-gradient-to-b from-white/10 via-transparent to-transparent sm:hidden" />
+
+      <div className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center pt-24 sm:pt-28 lg:pt-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="mb-8 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/90 backdrop-blur-xl">
+            <div className="mb-6 inline-flex max-w-full items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/90 backdrop-blur-xl sm:mb-8 sm:text-sm">
               <Star className="mr-2 h-4 w-4 text-white" />
               {"Private beta for serious token design teams"}
             </div>
 
-            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
+            <h1 className="mb-5 text-3xl font-bold tracking-tight text-white sm:mb-6 sm:text-5xl lg:text-7xl">
               Investor-ready tokenomics{" "}
               <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
                 without the spreadsheet drag
@@ -465,24 +468,24 @@ export default function EtherealBeamsHero() {
               for your Web3 project
             </h1>
 
-            <p className="mx-auto mb-10 max-w-3xl text-lg leading-8 text-white/80 sm:text-xl lg:text-2xl">
+            <p className="mx-auto mb-8 max-w-3xl text-base leading-7 text-white/80 sm:mb-10 sm:text-lg sm:leading-8 lg:text-2xl">
               Generate allocation logic, vesting schedules, emission curves, sell-pressure analysis, and investor red
               flags in one focused workflow built for founders, operators, and advisors.
             </p>
 
-            <div className="mx-auto mb-10 flex max-w-3xl flex-wrap items-center justify-center gap-3 text-xs font-medium text-white/70">
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-xl">
+            <div className="mx-auto mb-8 grid max-w-3xl gap-2 text-xs font-medium text-white/70 sm:mb-10 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-3">
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-center backdrop-blur-xl sm:py-1.5">
                 Free workspace starts immediately
               </span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-xl">
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-center backdrop-blur-xl sm:py-1.5">
                 Pro and Agency require sign-up first
               </span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-xl">
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-center backdrop-blur-xl sm:py-1.5">
                 Investor-ready PDF export on Pro+
               </span>
             </div>
 
-            <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="mb-10 flex flex-col items-stretch justify-center gap-3 sm:mb-12 sm:flex-row sm:items-center">
               <ButtonLink size="lg" className="font-semibold shadow-2xl shadow-white/25" href="/generate">
                 Start Free Workspace
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -492,17 +495,17 @@ export default function EtherealBeamsHero() {
               </ButtonLink>
             </div>
 
-            <div className="mx-auto grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-3">
+            <div className="mx-auto grid max-w-2xl grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-8">
               <div className="text-center">
-                <div className="mb-2 text-3xl font-bold text-white">60s</div>
+                <div className="mb-2 text-2xl font-bold text-white sm:text-3xl">60s</div>
                 <div className="text-sm text-white/60">Average first draft</div>
               </div>
               <div className="text-center">
-                <div className="mb-2 text-3xl font-bold text-white">$49/mo</div>
+                <div className="mb-2 text-2xl font-bold text-white sm:text-3xl">$49/mo</div>
                 <div className="text-sm text-white/60">Pro starts at</div>
               </div>
               <div className="text-center">
-                <div className="mb-2 text-3xl font-bold text-white">100x</div>
+                <div className="mb-2 text-2xl font-bold text-white sm:text-3xl">100x</div>
                 <div className="text-sm text-white/60">Cheaper than custom token work</div>
               </div>
             </div>
@@ -515,7 +518,7 @@ export default function EtherealBeamsHero() {
         </div>
       </div>
 
-      <div className="absolute inset-0 z-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
     </section>
   );
 }

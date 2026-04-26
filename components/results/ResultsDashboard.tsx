@@ -13,7 +13,6 @@ import type { PlanTier, SellPressureRow, TokenomicsOutput } from "@/types/mintom
 
 interface ResultsDashboardProps {
   onEditInputs: () => void;
-  onUpgradePreview: () => void;
   result: TokenomicsOutput;
   plan: PlanTier;
   onReset: () => void;
@@ -151,7 +150,6 @@ export default function ResultsDashboard({
   result,
   plan,
   onReset,
-  onUpgradePreview,
 }: ResultsDashboardProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
@@ -241,9 +239,9 @@ export default function ResultsDashboard({
     <div id="mintomics-report" className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 className="text-3xl font-bold text-white">{result.projectName}</h2>
-            <span className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/90">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">{result.projectName}</h2>
+            <span className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/90 whitespace-nowrap">
               {result.tokenSymbol}
             </span>
           </div>
@@ -256,13 +254,13 @@ export default function ResultsDashboard({
 
         <div
           data-pdf-exclude="true"
-          className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end"
+          className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end"
         >
-          <div className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${scoreStyles.badge}`}>
+          <div className={`inline-flex min-h-10 items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${scoreStyles.badge}`}>
             {scoreStyles.label}
           </div>
           <div
-            className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${plan === "pro"
+            className={`inline-flex min-h-10 items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] whitespace-nowrap ${plan === "pro"
               ? "border border-white/25 bg-white/10 text-white"
               : "border border-white/15 bg-white/5 text-gray-300"
               }`}
@@ -272,27 +270,27 @@ export default function ResultsDashboard({
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-gray-100 disabled:cursor-wait disabled:opacity-60"
+            className="min-h-11 w-full rounded-lg bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
           >
             {isExporting ? "Exporting..." : "Export PDF"}
           </button>
           {plan === "free" && (
             <button
               onClick={() => openUpgrade("red_flags")}
-              className="rounded-lg border border-white/30 px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-white/50 hover:text-white"
+              className="min-h-11 w-full rounded-lg border border-white/30 px-4 py-3 text-sm font-medium text-gray-200 transition-colors hover:border-white/50 hover:text-white sm:w-auto"
             >
               Unlock Pro
             </button>
           )}
           <button
             onClick={onEditInputs}
-            className="rounded-lg border border-white/15 px-4 py-2 text-sm text-gray-300 transition-colors hover:border-white/35 hover:text-white"
+            className="min-h-11 w-full rounded-lg border border-white/15 px-4 py-3 text-sm text-gray-300 transition-colors hover:border-white/35 hover:text-white sm:w-auto"
           >
             Edit Inputs
           </button>
           <button
             onClick={onReset}
-            className="rounded-lg border border-white/15 px-4 py-2 text-sm text-gray-300 transition-colors hover:border-white/35 hover:text-white"
+            className="min-h-11 w-full rounded-lg border border-white/15 px-4 py-3 text-sm text-gray-300 transition-colors hover:border-white/35 hover:text-white sm:w-auto"
           >
             New Project
           </button>
@@ -316,7 +314,7 @@ export default function ResultsDashboard({
             </div>
             <button
               onClick={() => openUpgrade("export")}
-              className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100"
+              className="min-h-11 w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100 sm:w-auto"
             >
               Unlock Pro
             </button>
@@ -333,7 +331,7 @@ export default function ResultsDashboard({
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="glass rounded-xl p-4 xl:col-span-2">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -476,10 +474,6 @@ export default function ResultsDashboard({
         reason={upgradeReason ?? "export"}
         onClose={() => {
           setUpgradeReason(null);
-        }}
-        onUnlockPreview={() => {
-          setUpgradeReason(null);
-          onUpgradePreview();
         }}
       />
     </div>

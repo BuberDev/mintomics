@@ -3,6 +3,7 @@
 import type { SavedTokenomicsProject } from "@/types/mintomics";
 
 interface ProjectHistorySidebarProps {
+  className?: string;
   activeProjectId: string | null;
   onCreateNew: () => void;
   onDeleteProject: (projectId: string) => void;
@@ -25,6 +26,7 @@ function formatTimestamp(value: string) {
 }
 
 export default function ProjectHistorySidebar({
+  className = "",
   activeProjectId,
   onCreateNew,
   onDeleteProject,
@@ -32,7 +34,7 @@ export default function ProjectHistorySidebar({
   projects,
 }: ProjectHistorySidebarProps) {
   return (
-    <aside className="space-y-4">
+    <aside className={`space-y-4 ${className}`}>
       <section className="glass rounded-2xl p-5">
         <p className="text-[11px] uppercase tracking-[0.2em] text-white/70">
           Workspace
@@ -43,7 +45,7 @@ export default function ProjectHistorySidebar({
         </p>
         <button
           onClick={onCreateNew}
-          className="mt-4 w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100"
+          className="mt-4 min-h-11 w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-gray-100"
         >
           New Project
         </button>
@@ -80,7 +82,7 @@ export default function ProjectHistorySidebar({
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-medium text-white">{project.result.projectName}</p>
-                      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-gray-500">
+                      <p className="mt-1 break-words text-xs uppercase tracking-[0.2em] text-gray-500">
                         {project.result.tokenSymbol} • {project.plan}
                       </p>
                     </div>
@@ -91,7 +93,7 @@ export default function ProjectHistorySidebar({
                     )}
                   </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                     <div className="rounded-lg border border-white/10 bg-black/40 p-3">
                       <p className="text-[11px] uppercase tracking-wide text-gray-500">Readiness</p>
                       <p className="mt-1 font-semibold text-white">
@@ -100,22 +102,22 @@ export default function ProjectHistorySidebar({
                     </div>
                     <div className="rounded-lg border border-white/10 bg-black/40 p-3">
                       <p className="text-[11px] uppercase tracking-wide text-gray-500">Updated</p>
-                      <p className="mt-1 font-semibold text-white">
+                      <p className="mt-1 break-words font-semibold text-white">
                         {formatTimestamp(project.updatedAt)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                     <button
                       onClick={() => onOpenProject(project)}
-                      className="flex-1 rounded-lg border border-white/15 px-3 py-2 text-sm text-gray-200 transition-colors hover:border-white/35 hover:text-white"
+                      className="min-h-11 flex-1 rounded-lg border border-white/15 px-3 py-3 text-sm text-gray-200 transition-colors hover:border-white/35 hover:text-white"
                     >
                       Open
                     </button>
                     <button
                       onClick={() => onDeleteProject(project.id)}
-                      className="rounded-lg border border-red-500/25 px-3 py-2 text-sm text-red-300 transition-colors hover:border-red-500/45 hover:text-red-200"
+                      className="min-h-11 rounded-lg border border-red-500/25 px-3 py-3 text-sm text-red-300 transition-colors hover:border-red-500/45 hover:text-red-200"
                     >
                       Delete
                     </button>

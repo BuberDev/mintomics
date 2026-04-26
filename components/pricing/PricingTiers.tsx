@@ -59,12 +59,12 @@ export default function PricingTiers({ isSignedIn }: PricingTiersProps) {
 
   return (
     <>
-      <div className="mt-8 inline-flex rounded-full border border-white/10 bg-white/5 p-1">
+      <div className="mt-8 flex w-full rounded-2xl border border-white/10 bg-white/5 p-1 sm:inline-flex sm:w-auto sm:rounded-full">
         {(["monthly", "annual"] as BillingCycle[]).map((option) => (
           <button
             key={option}
             onClick={() => setCycle(option)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition sm:flex-none sm:rounded-full sm:px-4 sm:py-2 ${
               cycle === option ? "bg-white text-black" : "text-gray-300 hover:text-white"
             }`}
           >
@@ -74,7 +74,7 @@ export default function PricingTiers({ isSignedIn }: PricingTiersProps) {
       </div>
       <p className="mt-3 text-sm text-gray-400">{cycleLabel}</p>
 
-      <div className="mt-12 grid gap-6 lg:grid-cols-3">
+      <div className="mt-10 grid gap-5 lg:grid-cols-3">
         {[tiers.free, tiers.pro, tiers.agency].map((tier) => {
           const isFeatured = "featured" in tier && tier.featured;
           const isFree = tier.name === "Free";
@@ -97,10 +97,12 @@ export default function PricingTiers({ isSignedIn }: PricingTiersProps) {
           return (
             <div
               key={tier.name}
-              className={`rounded-[2rem] p-7 ${isFeatured ? "glass-effect border border-white/25 shadow-2xl shadow-white/10" : "glass-effect"}`}
+              className={`rounded-[2rem] p-6 sm:p-7 ${
+                tier.name === "Pro" ? "order-1 lg:order-none" : tier.name === "Free" ? "order-2 lg:order-none" : "order-3 lg:order-none"
+              } ${isFeatured ? "glass-effect border border-white/25 shadow-2xl shadow-white/10" : "glass-effect"}`}
             >
               <div className="flex items-start justify-between gap-4">
-                <p className="text-xl font-semibold text-white">{tier.name}</p>
+                <p className="text-lg font-semibold text-white sm:text-xl">{tier.name}</p>
                 {isFeatured ? (
                   <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
                     Recommended
@@ -113,12 +115,12 @@ export default function PricingTiers({ isSignedIn }: PricingTiersProps) {
               </div>
               <p className="mt-3 text-sm leading-7 text-gray-400">{tier.description}</p>
               <div className="mt-8 flex items-end gap-2">
-                <span className="text-5xl font-semibold tracking-tight text-white">{price}</span>
+                <span className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">{price}</span>
                 <span className="pb-2 text-sm text-gray-500">{period ?? ""}</span>
               </div>
               <ul className="mt-8 space-y-3">
                 {tier.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3 text-sm text-gray-300">
+                  <li key={feature} className="flex items-start gap-3 text-sm leading-7 text-gray-300">
                     <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-white/80" />
                     <span>{feature}</span>
                   </li>
@@ -133,7 +135,7 @@ export default function PricingTiers({ isSignedIn }: PricingTiersProps) {
                   cycle,
                   signedIn: isSignedIn,
                 }}
-                className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-semibold transition ${
+                className={`mt-8 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-semibold transition ${
                   isFeatured
                     ? "bg-white text-black hover:bg-gray-100"
                     : "border border-white/15 bg-white/5 text-white hover:border-white/30 hover:bg-white/10"
