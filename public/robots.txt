@@ -3,5 +3,9 @@ Allow: /
 Disallow: /api/
 Disallow: /account/
 Disallow: /generate/
+Disallow: /sign-in/
+Disallow: /sign-up/
+Disallow: /forgot-password/
+Disallow: /reset-password/
 
-Sitemap: https://mintomics.ai/sitemap.xml
+Sitemap: https://www.mintomics.com/sitemap.xml

@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import AuthControls from "@/components/auth/AuthControls";
 import TrackPageView from "@/components/analytics/TrackPageView";
 import PricingTiers from "@/components/pricing/PricingTiers";
 import { ArrowRight, CircleDollarSign, LockKeyhole, UserPlus2 } from "lucide-react";
 import { getCurrentAuth } from "@/lib/auth/session";
+
+export const metadata: Metadata = {
+  title: "Pricing | Mintomics",
+  description:
+    "Compare Mintomics plans for founders, advisors, and agencies. Free, Pro, and Agency workflows for tokenomics design, simulation, and export.",
+  alternates: {
+    canonical: "/pricing",
+  },
+};
 
 type PricingPageProps = {
   searchParams?: {

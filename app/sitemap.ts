@@ -1,17 +1,16 @@
 import { MetadataRoute } from "next";
+import { absoluteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://mintomics.ai";
-
   return [
     {
-      url: baseUrl,
+      url: absoluteUrl("/"),
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1,
     },
     {
-      url: `${baseUrl}/pricing`,
+      url: absoluteUrl("/pricing"),
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,

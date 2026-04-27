@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { BadgeCheck, ShieldCheck, Sparkles, Users } from "lucide-react";
 import TrackPageView from "@/components/analytics/TrackPageView";
 import AgencyLeadForm from "@/components/agency/AgencyLeadForm";
+
+export const metadata: Metadata = {
+  title: "Agency | Mintomics",
+  description:
+    "Mintomics Agency is built for consultants and studios that need repeatable tokenomics delivery, white-label workflows, and priority onboarding.",
+  alternates: {
+    canonical: "/agency",
+  },
+};
 
 const highlights = [
   {

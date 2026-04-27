@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Disclaimer | Mintomics",
+  description:
+    "Mintomics provides decision support only. Review generated tokenomics with legal, compliance, and token engineering experts.",
+  alternates: {
+    canonical: "/disclaimer",
+  },
+};
 
 export default function DisclaimerPage() {
   return (

@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | Mintomics",
+  description:
+    "Read how Mintomics stores project inputs, generated outputs, and usage metadata, and how we handle third-party infrastructure.",
+  alternates: {
+    canonical: "/privacy",
+  },
+};
 
 export default function PrivacyPage() {
   return (

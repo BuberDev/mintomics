@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import AuthProvider from "@/components/auth/AuthProvider";
 import JsonLd from "@/components/seo/JsonLd";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mintomics.ai"),
+  metadataBase: new URL(SITE_URL),
   title: "Mintomics | Elite Tokenomics Design & Simulation Tool",
   description:
     "The world's most advanced tokenomics design platform. Create investor-ready token allocations, vesting schedules, and emission curves in 60 seconds. AI-powered simulation and red flag analysis for Web3 founders.",
@@ -23,10 +24,21 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     title: "Mintomics | Elite Tokenomics Design",
     description: "Design professional tokenomics for your Web3 project in under a minute.",
-    url: "https://mintomics.ai",
+    url: SITE_URL,
     siteName: "Mintomics",
     type: "website",
     locale: "en_US",

@@ -1,4 +1,5 @@
 import React from "react";
+import { SITE_URL, absoluteUrl } from "@/lib/site";
 
 export default function JsonLd() {
   const softwareSchema = {
@@ -24,8 +25,8 @@ export default function JsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Mintomics",
-    "url": "https://mintomics.ai",
-    "logo": "https://mintomics.ai/logo.png",
+    "url": SITE_URL,
+    "logo": absoluteUrl("/logo.png"),
     "sameAs": [
       "https://twitter.com/mintomics",
       "https://github.com/mintomics"
@@ -35,10 +36,10 @@ export default function JsonLd() {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "url": "https://mintomics.ai",
+    "url": SITE_URL,
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://mintomics.ai/search?q={search_term_string}",
+      "target": `${SITE_URL}/search?q={search_term_string}`,
       "query-input": "required name=search_term_string"
     }
   };
@@ -60,4 +61,3 @@ export default function JsonLd() {
     </>
   );
 }
-

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CreditCard, FileText, ShieldCheck, Sparkles, UserCircle2 } from "lucide-react";
@@ -9,6 +10,19 @@ import SignOutButton from "@/components/auth/SignOutButton";
 import SignOutAllButton from "@/components/auth/SignOutAllButton";
 
 export const runtime = "nodejs";
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+      "max-image-preview": "none",
+      "max-snippet": 0,
+      "max-video-preview": 0,
+    },
+  },
+};
 
 export default async function AccountPage() {
   const auth = await requireCurrentAuth("/account");
