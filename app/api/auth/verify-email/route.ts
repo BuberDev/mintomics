@@ -59,6 +59,28 @@ export async function GET(req: NextRequest) {
     await setUserEmailVerified(user.id);
     await issueSessionForUser(user.id);
 
+    // Send Welcome Email
+    try {
+      const { sendAuthEmail } = await import("@/lib/auth/mailer");
+      await sendAuthEmail({
+        to: user.email,
+        subject: "Welcome to Mintomics",
+        html: `
+          <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
+            <h1 style="font-size:24px;margin:0 0 16px">Welcome to Mintomics!</h1>
+            <p style="margin:0 0 16px">Your email has been verified. You're now ready to design professional tokenomics models.</p>
+            <p style="margin:0 0 24px">
+              <a href="${new URL("/generate", getAppOrigin(req)).toString()}" style="display:inline-block;background:#5b5bf7;color:#fff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600">Start designing</a>
+            </p>
+            <p style="margin:0 0 8px;color:#6b7280;font-size:14px">Need help? Reply to this email and our team will jump in.</p>
+          </div>
+        `,
+        text: `Welcome to Mintomics!\n\nYour email has been verified. Start designing your tokenomics model here: ${new URL("/generate", getAppOrigin(req)).toString()}`,
+      });
+    } catch (emailError) {
+      console.error("[Mintomics] Failed to send welcome email:", emailError);
+    }
+
     const metadataReturnTo =
       redeemed.metadata_json && typeof redeemed.metadata_json.returnTo === "string"
         ? redeemed.metadata_json.returnTo

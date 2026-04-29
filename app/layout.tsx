@@ -6,7 +6,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Mintomics | Elite Tokenomics Design & Simulation Tool",
+  title: {
+    default: "Mintomics | Elite Tokenomics Design & Simulation Tool",
+    template: "%s | Mintomics",
+  },
   description:
     "The world's most advanced tokenomics design platform. Create investor-ready token allocations, vesting schedules, and emission curves in 60 seconds. AI-powered simulation and red flag analysis for Web3 founders.",
   keywords: [
@@ -21,6 +24,8 @@ export const metadata: Metadata = {
     "investor ready tokenomics",
     "mintomics ai",
   ],
+  category: "technology",
+  classification: "Web3 Software",
   alternates: {
     canonical: "/",
   },
@@ -36,17 +41,27 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Mintomics | Elite Tokenomics Design",
+    title: "Mintomics | Elite Tokenomics Design & Simulation Tool",
     description: "Design professional tokenomics for your Web3 project in under a minute.",
     url: SITE_URL,
     siteName: "Mintomics",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Mintomics | Elite Tokenomics Design",
+      },
+    ],
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mintomics | Professional Tokenomics",
+    title: "Mintomics | Elite Tokenomics Design & Simulation",
     description: "Design, simulate, and export investor-ready tokenomics.",
+    images: ["/og-image.png"],
+    creator: "@mintomics",
   },
   manifest: "/manifest.json",
   icons: {

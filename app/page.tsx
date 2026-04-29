@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   BadgeAlert,
   Blocks,
@@ -11,6 +12,14 @@ import TrackPageView from "@/components/analytics/TrackPageView";
 import PricingTiers from "@/components/pricing/PricingTiers";
 import { getCurrentAuth } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Mintomics | Professional Tokenomics Design & AI Simulation Platform",
+  description: "The world's leading tokenomics design tool. Create investor-ready token allocations, vesting schedules, and emission curves in minutes. AI-powered simulation and red flag analysis.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 const featureCards = [
   {

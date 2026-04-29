@@ -56,7 +56,6 @@ export async function POST(req: NextRequest) {
           stripeInvoiceUrl,
           stripeStatus: session.payment_status ?? session.status ?? null,
         });
-        console.log("[Mintomics] Stripe webhook received:", event.type, session);
         break;
       }
       case "customer.subscription.created":
@@ -83,7 +82,6 @@ export async function POST(req: NextRequest) {
           stripeSubscriptionId: subscription.id,
           stripeStatus: subscription.status,
         });
-        console.log("[Mintomics] Stripe webhook received:", event.type, subscription);
         break;
       }
       case "invoice.paid":
@@ -105,16 +103,13 @@ export async function POST(req: NextRequest) {
           stripeInvoiceUrl: invoice.hosted_invoice_url ?? invoice.invoice_pdf ?? null,
           stripeStatus: invoice.status ?? null,
         });
-        console.log("[Mintomics] Stripe webhook received:", event.type, invoice);
         break;
       }
       case "invoice.payment_failed": {
-        const invoice = event.data.object as Stripe.Invoice;
-        console.log("[Mintomics] Stripe webhook received:", event.type, invoice);
         break;
       }
       default:
-        console.log("[Mintomics] Stripe webhook received:", event.type);
+        // Unsupported event type
     }
 
     return new Response(JSON.stringify({ received: true }), {

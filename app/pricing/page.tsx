@@ -7,9 +7,9 @@ import { ArrowRight, CircleDollarSign, LockKeyhole, UserPlus2 } from "lucide-rea
 import { getCurrentAuth } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Pricing | Mintomics",
+  title: "Pricing & Plans | Mintomics Tokenomics Tool",
   description:
-    "Compare Mintomics plans for founders, advisors, and agencies. Free, Pro, and Agency workflows for tokenomics design, simulation, and export.",
+    "Choose the right Mintomics plan for your project. From free tokenomics design to professional investor-ready reports and agency-scale workflows. Compare Free, Pro, and Agency tiers.",
   alternates: {
     canonical: "/pricing",
   },

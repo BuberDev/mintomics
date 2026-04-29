@@ -5,9 +5,9 @@ import TrackPageView from "@/components/analytics/TrackPageView";
 import AgencyLeadForm from "@/components/agency/AgencyLeadForm";
 
 export const metadata: Metadata = {
-  title: "Agency | Mintomics",
+  title: "Agency & Enterprise Tokenomics Solutions | Mintomics",
   description:
-    "Mintomics Agency is built for consultants and studios that need repeatable tokenomics delivery, white-label workflows, and priority onboarding.",
+    "Mintomics Agency is the elite tier for Web3 consultants and studios. Scale your tokenomics advisory with white-label reports, multi-client management, and priority support.",
   alternates: {
     canonical: "/agency",
   },
