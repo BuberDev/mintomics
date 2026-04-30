@@ -22,6 +22,6 @@ Mintomics replaces complex, error-prone spreadsheets with an intelligent, visual
 Mintomics is built for speed, security, and precision. It utilizes advanced mathematical simulations to ensure that the generated emission curves are accurate and sustainable for long-term project growth.
 
 ## Contact & Support
-- **Website**: https://www.mintomics.com
+- **Website**: https://mintomics.com
 - **Primary Use Case**: Professional Tokenomics Design and Simulation.
 - **SEO Keywords**: tokenomics tool, web3 token distribution, vesting generator, crypto emission modeling.

@@ -1,4 +1,4 @@
-const fallbackSiteUrl = "https://www.mintomics.com";
+const fallbackSiteUrl = "https://mintomics.com";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? fallbackSiteUrl;
 
